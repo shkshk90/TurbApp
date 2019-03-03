@@ -11,19 +11,24 @@
 
 #import <Foundation/Foundation.h>
 
-// First Screen View
+#pragma mark - First Screen View Resources
+/******************* First Screen View *************************/
 static const CGFloat FSVNavigationBarPercentage = 10.;
 
 static const CGFloat FSVVerticalPercentage   = 15.;
 static const CGFloat FSVHorizontalPercentage = 5.;
 
-static NSString *const FSVImageViewRes = @"FSV_Background";
+#define FSV_IMAGEVIEW_RES @"FSV_Background"
 
-static NSString *const FSVRecordButtonImgRes = @"FSV_LiveCapture";
-static NSString *const FSVRecordButtonTxtRes = @"Live Capture";
+#define FSV_RECORDBTN_IMG_RES @"FSV_LiveCapture"
+#define FSV_VIDEOBTN_IMG_RES  @"FSV_SelectVideo"
 
-static NSString *const FSVVideoButtonImgRes = @"FSV_SelectVideo";
-static NSString *const FSVVideoButtonTxtRes = @"Select Video";
+#define FSV_RECORDBTN_TXT_RES @"Live Capture"
+#define FSV_VIDEOBTN_TXT_RES  @"Select Video"
+/***************************************************************/
+
+
+
 
 
 #pragma mark - C functions

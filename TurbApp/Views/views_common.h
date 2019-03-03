@@ -17,7 +17,7 @@ __FILENAME__, __LINE__, __FUNCTION__]; \
 
 @protocol FHGViewsProtocol <NSObject>
 
-- (id)initWithContentView:(UIView *)superView;
+- (id)initWithContentView:(UIView *const)superView;
 - (UIView *)viewWithTag:(const NSInteger)tag;
 
 @end

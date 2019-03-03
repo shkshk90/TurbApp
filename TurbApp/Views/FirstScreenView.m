@@ -12,6 +12,7 @@
 
 
 
+
 #pragma mark - Implementation
 @implementation FHGFirstScreenView {
 
@@ -27,7 +28,7 @@
 }
 
 #pragma mark - Super Methods
-- (id)initWithContentView:(UIView *)superView
+- (id)initWithContentView:(UIView *const)superView
 {
     self = [super init] ?: nil;
     
@@ -73,10 +74,10 @@
     }
 }
 
-- (void)setupConstraits
+- (void)setButtonsTarget:(UIViewController *const)target withSelector:(const SEL)selector
 {
-    [self setupImageView];
-    [self setupMainStackView];
+    [_videoButton addTarget:target action:selector forControlEvents:UIControlEventTouchDown];
+    [_recordButton addTarget:target action:selector forControlEvents:UIControlEventTouchDown];
 }
 
 #pragma mark - Setup views methods
@@ -89,7 +90,7 @@
     [[_backgroundImageView.topAnchor constraintEqualToAnchor:_guide.topAnchor] setActive:YES];
     [[_backgroundImageView.bottomAnchor constraintEqualToAnchor:_guide.bottomAnchor] setActive:YES];
     
-    [_backgroundImageView setImage:[UIImage imageNamed:FSVImageViewRes]];
+    [_backgroundImageView setImage:[UIImage imageNamed:FSV_IMAGEVIEW_RES]];
     [_backgroundImageView setAlpha:0.8];
     
     [_backgroundImageView setOpaque:YES];
@@ -132,15 +133,15 @@
     
     switch (tag) {
         case FHGFirstScreenRecordButton:
-            image = [UIImage imageNamed:FSVRecordButtonImgRes];
+            image = [UIImage imageNamed:FSV_RECORDBTN_IMG_RES];
             color = [UIColor redColor];
-            text  = FSVRecordButtonTxtRes;
+            text  = FSV_RECORDBTN_TXT_RES;
             break;
             
         case FHGFirstScreenVideoButton:
-            image = [UIImage imageNamed:FSVVideoButtonImgRes];
+            image = [UIImage imageNamed:FSV_VIDEOBTN_IMG_RES];
             color = [UIColor blueColor];
-            text  = FSVVideoButtonTxtRes;
+            text  = FSV_VIDEOBTN_TXT_RES;
             break;
             
         default: FHG_TAG_NOT_HANDLED;
@@ -149,7 +150,7 @@
     const UIEdgeInsets imageInsets = UIEdgeInsetsMake(0., leftInsetForImage, 0., rightInsetForImage);
     const UIEdgeInsets titleInsets = UIEdgeInsetsMake(0., leftInsetForText, 0., 0.);
     
-    
+    [button setTag:tag];
     
     [button setImageEdgeInsets:imageInsets];
     [button setTitleEdgeInsets:titleInsets];
@@ -182,6 +183,12 @@
     
     [button setEnabled:YES];
     [button setUserInteractionEnabled:YES];
+}
+
+- (void)setupConstraits
+{
+    [self setupImageView];
+    [self setupMainStackView];
 }
 
 /*

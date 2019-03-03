@@ -29,12 +29,26 @@
     [self configureNavigation];
     
     _firstScreenView = [[FHGFirstScreenView alloc] initWithContentView:self.view];
+    [_firstScreenView setButtonsTarget:self withSelector:@selector(routeView:)];
 }
 
 #pragma mark - Navigation
 - (void)configureNavigation
 {
     [self.navigationItem setTitle:@"TurbApp"];
+}
+
+#pragma mark - IBActions
+- (IBAction)routeView:(UIButton *)sender
+{
+    switch (sender.tag) {
+        case FHGFirstScreenRecordButton:
+            NSLog(@"Ying");
+            break;
+        case FHGFirstScreenVideoButton:
+            NSLog(@"Yang");
+            break;
+    }
 }
 
 
