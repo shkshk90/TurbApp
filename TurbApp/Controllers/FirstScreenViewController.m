@@ -55,9 +55,9 @@
     }
     
     UINavigationController *const navigationController = [[UINavigationController alloc] initWithRootViewController:nextController];
-//    navigationController.modalPresentationStyle = UIModalPresentationFullScreen;
+    
     [navigationController setModalPresentationStyle:UIModalPresentationFullScreen];
-    [navigationController setModalTransitionStyle:UIModalTransitionStyleCoverVertical];
+    [navigationController setModalTransitionStyle:UIModalTransitionStyleCrossDissolve];
     
     [self presentViewController:navigationController animated:YES completion:nil];
 }

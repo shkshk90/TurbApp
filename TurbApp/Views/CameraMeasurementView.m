@@ -96,7 +96,7 @@
     const CGFloat w = fhgv_getPercentageOfScreenWidth(_bounds, 50.);
     const CGFloat h = CGRectGetHeight(r) * .5;
     
-    [_instructionsLayer setString:@"Set settings first!"];
+    [_instructionsLayer setString:CMV_INSTRUCTIONS_TXT_RES];
     [_instructionsLayer setAlignmentMode:kCAAlignmentCenter];
     
     [_instructionsLayer setFont:CTFontCreateWithName((__bridge CFStringRef)@"Optima-Regular" , 18., NULL)];
@@ -197,6 +197,9 @@
     [button setImage:image forState:UIControlStateNormal];
     
     [button setShowsTouchWhenHighlighted:(tag != FHGTagCMVCaptureButton)];
+    
+    [button setContentVerticalAlignment:UIControlContentVerticalAlignmentFill];
+    [button setContentHorizontalAlignment:UIControlContentHorizontalAlignmentFill];
 }
 
 - (void)configureTextLayer
@@ -243,29 +246,37 @@
 
 - (void)setupConstraintsForButton:(UIButton *const)button WithTag:(const FHGTagCameraMeasurement)tag
 {
-    CGFloat horizontalPercentage = 0.;
-    CGFloat verticallPercentage  = 0.;
-    CGFloat sidePercentage       = 0.;
+    const CGFloat screen50pWidth  = fhgv_getPercentageOfScreenWidth(_bounds, 50.);
+    const CGFloat screen95pHeight = fhgv_getPercentageOfScreenHeight(_bounds, 95.);
+    const CGFloat screen05pWidth  = fhgv_getPercentageOfScreenWidth(_bounds, 5.);
+    
+    CGFloat x;
+    CGFloat y;
+    CGFloat buttonSide;
+    UIEdgeInsets imageInsets = UIEdgeInsetsZero;
+    CGFloat temp;
     
     switch (tag) {
         case FHGTagCMVExitButton:
-            horizontalPercentage = kCMVExitHorlP;
-            verticallPercentage  = kCMVExitVertP;
-            sidePercentage       = kCMVExitSideP;
+            x = 0.;
+            y = 0.;
+            buttonSide   = fhgv_getPercentageOfScreenWidth(_bounds, kCMVExitSideP);
+            imageInsets  = UIEdgeInsetsMake(buttonSide/2.5, buttonSide/2.5, 0., 0.);
             
             break;
             
         case FHGTagCMVSettingsButton:
-            horizontalPercentage = kCMVSettHorlP;
-            verticallPercentage  = kCMVSettVertP;
-            sidePercentage       = kCMVSettSideP;
+            buttonSide = fhgv_getPercentageOfScreenWidth(_bounds, kCMVSettSideP);
+            temp = fhgv_getPercentageOfScreenWidth(_bounds, kCMVCaptSideP);
+            x = screen50pWidth - (temp / 2.) - buttonSide - screen05pWidth;
+            y = screen95pHeight - temp + ((temp - buttonSide) / 2.);
             
             break;
             
         case FHGTagCMVCaptureButton:
-            horizontalPercentage = kCMVCaptHorlP;
-            verticallPercentage  = kCMVCaptVertP;
-            sidePercentage       = kCMVCaptSideP;
+            buttonSide   = fhgv_getPercentageOfScreenWidth(_bounds, kCMVCaptSideP);
+            x = screen50pWidth - (buttonSide / 2.);
+            y = screen95pHeight - buttonSide;
             
             break;
             
@@ -273,22 +284,17 @@
             FHG_TAG_NOT_HANDLED;
     }
     
-    const CGFloat verticalSpacing    = fhgv_getPercentageOfScreenHeight(_bounds, verticallPercentage);
-    const CGFloat horizontalSpacing  = fhgv_getPercentageOfScreenWidth(_bounds, horizontalPercentage);
-    const CGFloat buttonSide         = fhgv_getPercentageOfScreenWidth(_bounds, sidePercentage);
-    
     [button setTranslatesAutoresizingMaskIntoConstraints:NO];
     
-    [[button.leadingAnchor constraintEqualToAnchor:_guide.leadingAnchor constant:horizontalSpacing] setActive:YES];
-    [[button.topAnchor constraintEqualToAnchor:_guide.topAnchor constant:verticalSpacing] setActive:YES];
+    [[button.leadingAnchor constraintEqualToAnchor:_guide.leadingAnchor constant:x] setActive:YES];
+    [[button.topAnchor constraintEqualToAnchor:_guide.topAnchor constant:y] setActive:YES];
     [button addConstraint:[NSLayoutConstraint
                            constraintWithItem:button
                            attribute:NSLayoutAttributeWidth
                            relatedBy:NSLayoutRelationEqual
                            toItem:nil
                            attribute:NSLayoutAttributeNotAnAttribute
-                           multiplier:1. constant:buttonSide * 1.1]];
-    
+                           multiplier:1. constant:buttonSide]];
     [button addConstraint:[NSLayoutConstraint
                            constraintWithItem:button
                            attribute:NSLayoutAttributeHeight
@@ -296,8 +302,9 @@
                            toItem:button
                            attribute:NSLayoutAttributeWidth
                            multiplier:1. constant:1.]];
+    [button setImageEdgeInsets:imageInsets];
     
-    [button setImageEdgeInsets:UIEdgeInsetsMake(buttonSide, buttonSide, buttonSide, buttonSide)];
+    return;
 }
 
 

@@ -30,21 +30,16 @@ static const CGFloat kFSVHorizontalPercentage = 5.;
 
 #pragma mark - Camera Measurement View Resources
 /******************* Camera Measurement View *************************/
-static const CGFloat kCMVExitHorlP = 5.;
-static const CGFloat kCMVExitVertP = 3.;
-static const CGFloat kCMVExitSideP = 8.;
 
-static const CGFloat kCMVSettHorlP = 10.;
-static const CGFloat kCMVSettVertP = 79.;
+static const CGFloat kCMVExitSideP = 16.;
 static const CGFloat kCMVSettSideP = 15.;
-
-static const CGFloat kCMVCaptHorlP = 35.;
-static const CGFloat kCMVCaptVertP = 75.;
 static const CGFloat kCMVCaptSideP = 30.;
 
-#define CMV_EXITBTN_IMG_RES     @"CMV_Exit"
-#define CMV_SETTINGSBTN_IMG_RES @"CMV_Settings"
-#define CMV_CAPTUREBTN_IMG_RES  @"CMV_Capture"
+#define CMV_EXITBTN_IMG_RES      @"CMV_Exit"
+#define CMV_SETTINGSBTN_IMG_RES  @"CMV_Settings"
+#define CMV_CAPTUREBTN_IMG_RES   @"CMV_Capture"
+
+#define CMV_INSTRUCTIONS_TXT_RES @"Set settings first!"
 /*********************************************************************/
 
 

@@ -23,7 +23,6 @@ NS_ASSUME_NONNULL_BEGIN
 - (CALayer *)roiLayer;
 
 - (void)updateTextLayer;        // To be called in ViewDidAppear
-- (void)updateCaptureButton;    // To be called in ViewWillAppear
 
 @end
 
