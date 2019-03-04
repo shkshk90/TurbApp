@@ -7,7 +7,7 @@
 //
 
 #import <UIKit/UIKit.h>
-#import "views_common.h"
+#import "../common.h"
 
 NS_ASSUME_NONNULL_BEGIN
 

@@ -7,6 +7,10 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		E028A511222D533F00401A84 /* CameraPreviewSubView.m in Sources */ = {isa = PBXBuildFile; fileRef = E028A510222D533F00401A84 /* CameraPreviewSubView.m */; };
+		E028A515222D541100401A84 /* CameraMeasurementView.m in Sources */ = {isa = PBXBuildFile; fileRef = E028A514222D541100401A84 /* CameraMeasurementView.m */; };
+		E028A519222D6DA900401A84 /* RoiGestureHandler.m in Sources */ = {isa = PBXBuildFile; fileRef = E028A518222D6DA900401A84 /* RoiGestureHandler.m */; };
+		E043583C222D5166007F737A /* CameraMeasurementViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = E043583B222D5166007F737A /* CameraMeasurementViewController.m */; };
 		E07CB755222C0F450083CEAE /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = E07CB754222C0F450083CEAE /* AppDelegate.m */; };
 		E07CB758222C0F450083CEAE /* FirstScreenViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = E07CB757222C0F450083CEAE /* FirstScreenViewController.m */; };
 		E07CB75B222C0F450083CEAE /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = E07CB759222C0F450083CEAE /* Main.storyboard */; };
@@ -36,6 +40,15 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		E028A50F222D533F00401A84 /* CameraPreviewSubView.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CameraPreviewSubView.h; sourceTree = "<group>"; };
+		E028A510222D533F00401A84 /* CameraPreviewSubView.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = CameraPreviewSubView.m; sourceTree = "<group>"; };
+		E028A513222D541100401A84 /* CameraMeasurementView.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CameraMeasurementView.h; sourceTree = "<group>"; };
+		E028A514222D541100401A84 /* CameraMeasurementView.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = CameraMeasurementView.m; sourceTree = "<group>"; };
+		E028A516222D562000401A84 /* CameraMeasurement_common.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CameraMeasurement_common.h; sourceTree = "<group>"; };
+		E028A517222D6DA900401A84 /* RoiGestureHandler.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = RoiGestureHandler.h; sourceTree = "<group>"; };
+		E028A518222D6DA900401A84 /* RoiGestureHandler.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = RoiGestureHandler.m; sourceTree = "<group>"; };
+		E043583A222D5166007F737A /* CameraMeasurementViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = CameraMeasurementViewController.h; path = TurbApp/Controllers/CameraMeasurementViewController.h; sourceTree = SOURCE_ROOT; };
+		E043583B222D5166007F737A /* CameraMeasurementViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = CameraMeasurementViewController.m; path = TurbApp/Controllers/CameraMeasurementViewController.m; sourceTree = SOURCE_ROOT; };
 		E07CB750222C0F450083CEAE /* TurbApp.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = TurbApp.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		E07CB753222C0F450083CEAE /* AppDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AppDelegate.h; sourceTree = "<group>"; };
 		E07CB754222C0F450083CEAE /* AppDelegate.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = AppDelegate.m; sourceTree = "<group>"; };
@@ -85,6 +98,45 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		E028A50C222D52C400401A84 /* FirstScreen */ = {
+			isa = PBXGroup;
+			children = (
+				E07CB756222C0F450083CEAE /* FirstScreenViewController.h */,
+				E07CB757222C0F450083CEAE /* FirstScreenViewController.m */,
+			);
+			name = FirstScreen;
+			sourceTree = "<group>";
+		};
+		E028A50E222D52D500401A84 /* CameraMeasurement */ = {
+			isa = PBXGroup;
+			children = (
+				E043583A222D5166007F737A /* CameraMeasurementViewController.h */,
+				E043583B222D5166007F737A /* CameraMeasurementViewController.m */,
+			);
+			name = CameraMeasurement;
+			sourceTree = "<group>";
+		};
+		E028A512222D534500401A84 /* CameraMeasurement */ = {
+			isa = PBXGroup;
+			children = (
+				E028A50F222D533F00401A84 /* CameraPreviewSubView.h */,
+				E028A510222D533F00401A84 /* CameraPreviewSubView.m */,
+				E028A513222D541100401A84 /* CameraMeasurementView.h */,
+				E028A514222D541100401A84 /* CameraMeasurementView.m */,
+				E028A516222D562000401A84 /* CameraMeasurement_common.h */,
+			);
+			name = CameraMeasurement;
+			sourceTree = "<group>";
+		};
+		E028A51A222D759A00401A84 /* RoiGestureHandlerClass */ = {
+			isa = PBXGroup;
+			children = (
+				E028A517222D6DA900401A84 /* RoiGestureHandler.h */,
+				E028A518222D6DA900401A84 /* RoiGestureHandler.m */,
+			);
+			name = RoiGestureHandlerClass;
+			sourceTree = "<group>";
+		};
 		E07CB747222C0F450083CEAE = {
 			isa = PBXGroup;
 			children = (
@@ -108,11 +160,11 @@
 		E07CB752222C0F450083CEAE /* TurbApp */ = {
 			isa = PBXGroup;
 			children = (
+				E07CB785222C11430083CEAE /* Models */,
+				E07CB786222C114F0083CEAE /* Views */,
+				E07CB787222C11540083CEAE /* Controllers */,
 				E07CB78B222C17380083CEAE /* Resources */,
 				E07CB78A222C17210083CEAE /* Main */,
-				E07CB787222C11540083CEAE /* Controllers */,
-				E07CB786222C114F0083CEAE /* Views */,
-				E07CB785222C11430083CEAE /* Models */,
 			);
 			path = TurbApp;
 			sourceTree = "<group>";
@@ -138,7 +190,6 @@
 		E07CB785222C11430083CEAE /* Models */ = {
 			isa = PBXGroup;
 			children = (
-				E07CB788222C16160083CEAE /* FirstScreen */,
 			);
 			path = Models;
 			sourceTree = "<group>";
@@ -147,6 +198,7 @@
 			isa = PBXGroup;
 			children = (
 				E07CB78C222C18D70083CEAE /* FirstScreen */,
+				E028A512222D534500401A84 /* CameraMeasurement */,
 				E07CB790222C1AD00083CEAE /* views_common.h */,
 				E07CB792222C21500083CEAE /* views_resources.h */,
 			);
@@ -156,17 +208,11 @@
 		E07CB787222C11540083CEAE /* Controllers */ = {
 			isa = PBXGroup;
 			children = (
+				E028A50C222D52C400401A84 /* FirstScreen */,
+				E028A50E222D52D500401A84 /* CameraMeasurement */,
+				E028A51A222D759A00401A84 /* RoiGestureHandlerClass */,
 			);
 			path = Controllers;
-			sourceTree = "<group>";
-		};
-		E07CB788222C16160083CEAE /* FirstScreen */ = {
-			isa = PBXGroup;
-			children = (
-				E07CB756222C0F450083CEAE /* FirstScreenViewController.h */,
-				E07CB757222C0F450083CEAE /* FirstScreenViewController.m */,
-			);
-			name = FirstScreen;
 			sourceTree = "<group>";
 		};
 		E07CB78A222C17210083CEAE /* Main */ = {
@@ -335,6 +381,10 @@
 				E07CB763222C0F470083CEAE /* main.m in Sources */,
 				E07CB755222C0F450083CEAE /* AppDelegate.m in Sources */,
 				E07CB78F222C19090083CEAE /* FirstScreenView.m in Sources */,
+				E028A515222D541100401A84 /* CameraMeasurementView.m in Sources */,
+				E028A519222D6DA900401A84 /* RoiGestureHandler.m in Sources */,
+				E043583C222D5166007F737A /* CameraMeasurementViewController.m in Sources */,
+				E028A511222D533F00401A84 /* CameraPreviewSubView.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

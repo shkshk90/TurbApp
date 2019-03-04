@@ -19,6 +19,7 @@ __FILENAME__, __LINE__, __FUNCTION__]; \
 
 - (id)initWithContentView:(UIView *const)superView;
 - (UIView *)viewWithTag:(const NSInteger)tag;
+- (void)setButtonsTarget:(UIViewController *const)target withSelector:(const SEL)selector;
 
 @end
 

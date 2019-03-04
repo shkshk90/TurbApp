@@ -9,11 +9,11 @@
 #ifndef FirstScreen_common_h
 #define FirstScreen_common_h
 
-typedef NS_ENUM(NSInteger, FHGFirstScreenTag) {
-    FHGFirstScreenRecordButton  = 1,
-    FHGFirstScreenVideoButton   = 2,
-    FHGFirstScreenStackView     = 3,
-    FHGFirstScreenImageView     = 4,
+typedef NS_ENUM(NSInteger, FHGTagFirstScreen) {
+    FHGTagFSVRecordButton  = 1,
+    FHGTagFSVVideoButton   = 2,
+    FHGTagFSVStackView     = 3,
+    FHGTagFSVImageView     = 4,
 };
 
 #endif /* FirstScreen_common_h */

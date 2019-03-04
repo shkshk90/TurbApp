@@ -7,7 +7,6 @@
 //
 
 #import "FirstScreenView.h"
-#import "../common.h"
 #import "views_resources.h"
 
 
@@ -44,8 +43,8 @@
     _recordButton        = [UIButton buttonWithType:UIButtonTypeSystem];
     _videoButton         = [UIButton buttonWithType:UIButtonTypeSystem];
     
-    [self setupButton:_videoButton withTag:FHGFirstScreenVideoButton];
-    [self setupButton:_recordButton withTag:FHGFirstScreenRecordButton];
+    [self setupButton:_videoButton  withTag:FHGTagFSVVideoButton];
+    [self setupButton:_recordButton withTag:FHGTagFSVRecordButton];
     
     
     [_mainStackView setSpacing:5.];
@@ -65,11 +64,11 @@
 
 - (UIView *)viewWithTag:(const NSInteger)tag
 {
-    switch ((FHGFirstScreenTag)tag) {
-        case FHGFirstScreenImageView     : return _backgroundImageView;
-        case FHGFirstScreenStackView     : return _mainStackView;
-        case FHGFirstScreenVideoButton   : return _videoButton;
-        case FHGFirstScreenRecordButton  : return _recordButton;
+    switch ((FHGTagFirstScreen)tag) {
+        case FHGTagFSVImageView     : return _backgroundImageView;
+        case FHGTagFSVStackView     : return _mainStackView;
+        case FHGTagFSVVideoButton   : return _videoButton;
+        case FHGTagFSVRecordButton  : return _recordButton;
         default : FHG_TAG_NOT_HANDLED;
     }
 }
@@ -95,13 +94,13 @@
     
     [_backgroundImageView setOpaque:YES];
     
-    [_backgroundImageView setTag:(NSInteger)FHGFirstScreenImageView];
+    [_backgroundImageView setTag:(NSInteger)FHGTagFSVImageView];
 }
 
 - (void)setupMainStackView
 {
-    const CGFloat verticalSpacing    = fhgv_getPercentageOfScreenHeight(_bounds, FSVVerticalPercentage);
-    const CGFloat horizontalSpacing  = fhgv_getPercentageOfScreenWidth(_bounds, FSVHorizontalPercentage);
+    const CGFloat verticalSpacing    = fhgv_getPercentageOfScreenHeight(_bounds, kFSVVerticalPercentage);
+    const CGFloat horizontalSpacing  = fhgv_getPercentageOfScreenWidth( _bounds, kFSVHorizontalPercentage);
     
     [_mainStackView setTranslatesAutoresizingMaskIntoConstraints:NO];
     
@@ -115,11 +114,11 @@
     
     [_mainStackView setOpaque:YES];
     
-    [_mainStackView setTag:(NSInteger)FHGFirstScreenStackView];
+    [_mainStackView setTag:(NSInteger)FHGTagFSVStackView];
     [_mainStackView setBackgroundColor:[UIColor redColor]];
 }
 
-- (void)setupButton:(UIButton *)button withTag:(FHGFirstScreenTag)tag
+- (void)setupButton:(UIButton *)button withTag:(const FHGTagFirstScreen)tag
 {
     const CGFloat fontSize            = (CGFloat)fhgv_getPercentageOfScreenHeight(_bounds, 5);
     
@@ -132,13 +131,13 @@
     NSString *text;
     
     switch (tag) {
-        case FHGFirstScreenRecordButton:
+        case FHGTagFSVRecordButton:
             image = [UIImage imageNamed:FSV_RECORDBTN_IMG_RES];
             color = [UIColor redColor];
             text  = FSV_RECORDBTN_TXT_RES;
             break;
             
-        case FHGFirstScreenVideoButton:
+        case FHGTagFSVVideoButton:
             image = [UIImage imageNamed:FSV_VIDEOBTN_IMG_RES];
             color = [UIColor blueColor];
             text  = FSV_VIDEOBTN_TXT_RES;

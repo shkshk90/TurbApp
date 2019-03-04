@@ -9,6 +9,7 @@
 #import "FirstScreenViewController.h"
 #import "../common.h"
 #import "../Views/FirstScreenView.h"
+#import "CameraMeasurementViewController.h"
 
 #pragma mark - Interface
 @interface FHGFirstScreenViewController ()
@@ -41,14 +42,24 @@
 #pragma mark - IBActions
 - (IBAction)routeView:(UIButton *)sender
 {
+    UIViewController *nextController;
     switch (sender.tag) {
-        case FHGFirstScreenRecordButton:
+        case FHGTagFSVRecordButton:
             NSLog(@"Ying");
+            nextController = [[FHGCameraMeasurementViewController alloc] init];
             break;
-        case FHGFirstScreenVideoButton:
+        case FHGTagFSVVideoButton:
             NSLog(@"Yang");
+            return;
             break;
     }
+    
+    UINavigationController *const navigationController = [[UINavigationController alloc] initWithRootViewController:nextController];
+//    navigationController.modalPresentationStyle = UIModalPresentationFullScreen;
+    [navigationController setModalPresentationStyle:UIModalPresentationFullScreen];
+    [navigationController setModalTransitionStyle:UIModalTransitionStyleCoverVertical];
+    
+    [self presentViewController:navigationController animated:YES completion:nil];
 }
 
 

@@ -14,5 +14,6 @@
 
 #import "Views/views_common.h"
 #import "Views/FirstScreen_common.h"
+#import "Views/CameraMeasurement_common.h"
 
 #endif /* common_h */
