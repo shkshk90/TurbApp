@@ -7,9 +7,13 @@
 //
 
 #import "FirstScreenViewController.h"
+#import "CameraMeasurementViewController.h"
+#import "StorageMeasurementViewController.h"
+
 #import "../common.h"
 #import "../Views/FirstScreenView.h"
-#import "CameraMeasurementViewController.h"
+#import "../Views/FirstScreen_common.h"
+
 
 #pragma mark - Interface
 @interface FHGFirstScreenViewController ()
@@ -47,10 +51,13 @@
         case FHGTagFSVRecordButton:
             NSLog(@"Ying");
             nextController = [[FHGCameraMeasurementViewController alloc] init];
+            
             break;
+            
         case FHGTagFSVVideoButton:
             NSLog(@"Yang");
-            return;
+            nextController = [[FHGStorageMeasurementViewController alloc] init];
+            
             break;
     }
     

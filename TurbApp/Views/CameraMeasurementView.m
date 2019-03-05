@@ -7,8 +7,12 @@
 //
 
 #import "CameraMeasurementView.h"
-#import "views_resources.h"
 #import "CameraPreviewSubView.h"
+
+#import "../common.h"
+#import "views_resources.h"
+#import "CameraMeasurement_common.h"
+
 
 @import Foundation;
 @import AVFoundation;

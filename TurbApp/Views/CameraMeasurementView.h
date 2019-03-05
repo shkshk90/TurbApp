@@ -7,7 +7,7 @@
 //
 
 #import <UIKit/UIKit.h>
-#import  "../common.h"
+#import  "views_common.h"
 
 @class AVCaptureSession;
 

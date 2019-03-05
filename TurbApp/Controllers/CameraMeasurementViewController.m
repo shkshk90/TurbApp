@@ -7,9 +7,13 @@
 //
 
 #import "CameraMeasurementViewController.h"
+#import "ExperimentParametersViewController.h"
+#import "RoiGestureHandler.h"
+
 #import "../common.h"
 #import "../Views/CameraMeasurementView.h"
-#import "RoiGestureHandler.h"
+#import "../Views/CameraMeasurement_common.h"
+
 
 @import AVFoundation;
 
@@ -222,12 +226,18 @@
 
 -(IBAction)buttonsAction:(UIButton *)sender
 {
+    UIViewController *nextController;
+    UIModalTransitionStyle transitionStyle;
+    
     switch (sender.tag) {
         case FHGTagCMVCaptureButton :
             NSLog(@"Hello");
             break;
             
         case FHGTagCMVSettingsButton :
+            nextController  = [[FHGExperimentParametersViewController alloc] init];
+            transitionStyle = UIModalTransitionStyleCoverVertical;
+            
             NSLog(@"Settings");
             break;
             
@@ -238,6 +248,16 @@
         default :
             FHG_TAG_NOT_HANDLED;
     }
+    
+    if (nextController == nil)
+        return;
+    
+    UINavigationController *const navigationController = [[UINavigationController alloc] initWithRootViewController:nextController];
+    
+    [navigationController setModalPresentationStyle:UIModalPresentationFullScreen];
+    [navigationController setModalTransitionStyle:transitionStyle];
+    
+    [self presentViewController:navigationController animated:YES completion:nil];
 }
 
 #pragma mark - Navigation methods

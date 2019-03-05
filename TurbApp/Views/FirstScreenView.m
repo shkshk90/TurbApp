@@ -7,7 +7,9 @@
 //
 
 #import "FirstScreenView.h"
+#import "../common.h"
 #import "views_resources.h"
+#import "FirstScreen_common.h"
 
 
 

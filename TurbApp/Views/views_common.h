@@ -9,17 +9,16 @@
 #ifndef views_common_h
 #define views_common_h
 
-#define FHG_TAG_NOT_HANDLED do { \
-[NSException raise:@"TagNotHandledException" \
-format:@"[%s:%d %s]: Tag is not handled", \
-__FILENAME__, __LINE__, __FUNCTION__]; \
-} while(NO);
-
 @protocol FHGViewsProtocol <NSObject>
 
 - (id)initWithContentView:(UIView *const)superView;
 - (UIView *)viewWithTag:(const NSInteger)tag;
+
 - (void)setButtonsTarget:(UIViewController *const)target withSelector:(const SEL)selector;
+
+@optional
+- (void)setTextFieldDelegateAndTarget:(UIViewController<UITextFieldDelegate> *const)target withSelector:(const SEL)selector;
+
 
 @end
 

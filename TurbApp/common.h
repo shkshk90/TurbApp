@@ -12,8 +12,18 @@
 
 #define __FILENAME__ (strrchr(__FILE__, '/') ? strrchr(__FILE__, '/') + 1 : __FILE__)
 
-#import "Views/views_common.h"
-#import "Views/FirstScreen_common.h"
-#import "Views/CameraMeasurement_common.h"
+#define FHG_TAG_NOT_HANDLED do { \
+[NSException raise:@"TagNotHandledException" \
+format:@"[%s:%d %s]: Tag is not handled", \
+__FILENAME__, __LINE__, __FUNCTION__]; \
+} while(NO);
+
+static const CGFloat kFHGMaximumNumberOfSamples = 120.;
+
+@protocol ExperimentDataProtocol <NSObject>
+
+- (void)setExperimentDataWithDict:(NSDictionary *)dict;
+
+@end
 
 #endif /* common_h */
