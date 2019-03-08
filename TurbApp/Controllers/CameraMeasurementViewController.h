@@ -12,6 +12,9 @@ NS_ASSUME_NONNULL_BEGIN
 
 @interface FHGCameraMeasurementViewController : UIViewController
 
+@property (strong,   nonatomic) NSDictionary  *experimentDataDict;
+@property (readonly, nonatomic) CGSize         videoSize;
+
 @end
 
 NS_ASSUME_NONNULL_END

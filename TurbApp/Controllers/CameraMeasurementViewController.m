@@ -13,13 +13,15 @@
 #import "../common.h"
 #import "../Views/CameraMeasurementView.h"
 #import "../Views/CameraMeasurement_common.h"
+#import "UIViewController+UIViewController_FHGViewAddition.h"
 
 
 @import AVFoundation;
+@import CoreText;
 
 #define CMVC_QUEUE_NAME "Camera Measurement Queue"
 
-@interface FHGCameraMeasurementViewController ()
+@interface FHGCameraMeasurementViewController () <FHGProtocolExperimentParametersDelegate>
 
 @end
 
@@ -35,7 +37,10 @@
 @private AVCaptureVideoDataOutput   *_videoDataOutput;
     
 @private FHGRoiGestureHandler       *_gesturesHandler;
+    
 }
+
+@synthesize experimentDataDict = _experimentDataDict;
 
 #pragma mark - View methods
 - (void)viewDidLoad
@@ -43,7 +48,10 @@
     [super viewDidLoad];
     // Do any additional setup after loading the view.
 
-    _contentView     = [[FHGCameraMeasurementView alloc] initWithContentView:self.view];
+//    _contentView     = [[FHGCameraMeasurementView alloc] initWithContentView:self.view];
+    _contentView     = [[FHGCameraMeasurementView alloc] init];
+    [self fhg_addMainSubView:_contentView];
+    
     _gesturesHandler = [[FHGRoiGestureHandler alloc] initWithView:[_contentView viewWithTag:FHGTagCMVCameraView]
                                                            forROI:[_contentView roiLayer]];
 
@@ -63,6 +71,8 @@
     
     [_gesturesHandler enableAllGestures];
     [[_contentView roiLayer] setHidden:YES];
+    
+    _experimentDataDict = nil;
 }
 
 - (void)viewWillAppear:(BOOL)animated
@@ -79,24 +89,114 @@
                          [self setNeedsStatusBarAppearanceUpdate];
                      } completion:nil];
     
-    UIButton *const captureButton = (UIButton *)[_contentView viewWithTag:FHGTagCMVCaptureButton];
-    [self updateCaptureButton:captureButton];
-}
-
-- (void)viewDidAppear:(BOOL)animated
-{
-    [super viewDidAppear:animated];
-    [_contentView updateTextLayer];
     [[_contentView roiLayer] setHidden:NO];
 }
 
-- (void) viewDidDisappear:(BOOL)animated
+- (void)viewDidDisappear:(BOOL)animated
 {
     dispatch_async(_queue, ^{
         [self->_captureSession stopRunning];
     });
     
     [super viewDidDisappear:animated];
+}
+
+#pragma mark - Buttons methods
+-(IBAction)buttonsAction:(UIButton *)sender
+{
+    UIViewController *nextController;
+    UIModalTransitionStyle transitionStyle = UIModalTransitionStyleCoverVertical;
+    
+    switch (sender.tag) {
+        case FHGTagCMVCaptureButton :
+            if (_experimentDataDict == nil)
+                [self disabledCaptureAction];
+            else
+                [self enabledCaptureAction];
+            
+            NSLog(@"Capture clicked");
+            
+            return;
+            break;
+            
+        case FHGTagCMVSettingsButton :
+            nextController  = [[FHGExperimentParametersViewController alloc] init];
+            transitionStyle = UIModalTransitionStyleCoverVertical;
+            
+            [((FHGExperimentParametersViewController *)nextController) setDelegate:self];
+            
+            NSLog(@"Settings");
+            break;
+            
+        case FHGTagCMVExitButton :
+            [self dismissViewControllerAnimated:YES completion:nil];
+            break;
+            
+        default :
+            FHG_TAG_NOT_HANDLED;
+    }
+    
+    UINavigationController *const navigationController = [[UINavigationController alloc] initWithRootViewController:nextController];
+    
+    [navigationController setModalPresentationStyle:UIModalPresentationFullScreen];
+    [navigationController setModalTransitionStyle:transitionStyle];
+    
+    [self presentViewController:navigationController animated:YES completion:nil];
+}
+
+- (void)enabledCaptureAction
+{
+    NSLog(@"Hello again");
+    //    For Testing
+    //    const CGFloat mainHeight = CGRectGetHeight([UIScreen mainScreen].bounds);
+    //    const CGFloat mainWidth  = CGRectGetWidth([UIScreen mainScreen].bounds);
+    //
+    //    const CGFloat vidHeight  = [(NSNumber *)videoDataOutput.videoSettings[@"Height"] doubleValue];
+    //    const CGFloat vidWidth   = [(NSNumber *)videoDataOutput.videoSettings[@"Width"]  doubleValue];
+    //    NSLog(@"H: %f, %f --> %f", mainHeight, vidWidth, vidHeight   / mainWidth);
+    //    NSLog(@"W: %f, %f --> %f", mainWidth,  vidHeight,  vidWidth  / mainHeight);
+    
+    // NOTE Video's width IS Screen's height
+//    const CGFloat ratio = [(NSNumber *)videoDataOutput.videoSettings[@"Height"] doubleValue] /
+//    CGRectGetWidth([UIScreen mainScreen].bounds);
+//
+//    const CGRect    roiFrame    = roiLayer.frame;
+//    const NSInteger frameSide   = (NSInteger)lround(roiFrame.size.width * ratio);   // Actual size in video pixels
+//
+//    CGFloat roundedFrameSide;
+//
+//    if (frameSide <= 128)
+//        roundedFrameSide = 128.;
+//    else {
+//        const NSInteger rem = frameSide % 128;
+//        const NSInteger apx = frameSide - rem;
+//
+//        roundedFrameSide = (CGFloat)((rem >= 64) ? apx + 128 : apx);  // Determine whether to floor or ceil
+//    }
+//
+//    const CGRect roiVideoFrame = CGRectMake(roiFrame.origin.x    * ratio,
+//                                            roiFrame.origin.y    * ratio,
+//                                            roundedFrameSide,    roundedFrameSide);
+//
+//    NSLog(@"%f, %f, %f, %f", roiFrame.origin.x, roiFrame.origin.y, roiFrame.size.width, roiFrame.size.height);
+//    NSLog(@"%f, %f, %f, %f", roiFrame.origin.x * ratio, roiFrame.origin.y * ratio,
+//          roiFrame.size.width * ratio, roiFrame.size.height * ratio);
+//    NSLog(@"%f, %f, %f, %f", roiVideoFrame.origin.x, roiVideoFrame.origin.y, roiVideoFrame.size.width, roiVideoFrame.size.height);
+    
+    ///////////////// TODOOOOOOOooOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOO
+}
+
+- (void)disabledCaptureAction
+{
+    CATextLayer *const instructionsLayer = [_contentView instructionsLayer];
+    
+    if (instructionsLayer.hidden) {
+        [instructionsLayer setHidden:NO];
+        
+        dispatch_after(dispatch_time(DISPATCH_TIME_NOW, 1 * NSEC_PER_SEC), dispatch_get_main_queue(), ^{
+            [instructionsLayer setHidden:YES];
+        });
+    }
 }
 
 #pragma mark - Capture device methods
@@ -207,57 +307,15 @@
             [self->_captureSession commitConfiguration];
         }
         
+        self->_videoSize.width  = [[self->_videoDataOutput.videoSettings valueForKey:@"Width"]  doubleValue];
+        self->_videoSize.height = [[self->_videoDataOutput.videoSettings valueForKey:@"Height"] doubleValue];
+        
+        
         NSLog(@"[%s:%d]:  %@", __FILENAME__, __LINE__, self->_videoDataOutput.videoSettings);
+        
+        FHG_NS_LOG(@"Width = %f",  self->_videoSize.width);
+        FHG_NS_LOG(@"Height = %f", self->_videoSize.height);
     });
-}
-
-#pragma mark - Buttons methods
-- (void)updateCaptureButton:(UIButton *const)captureButton
-{
-//    UIColor *const color  = (dataDict == nil) ? [UIColor grayColor] :
-//    [UIColor redColor];
-//    const SEL action      = (dataDict == nil) ? @selector(disabledCaptureAction) :
-//    @selector(enabledCaptureAction);
-//
-//    [captureButton setTintColor:color];
-//    [captureButton removeTarget:NULL action:nil forControlEvents:UIControlEventAllEvents];
-//    [captureButton addTarget:self action:action forControlEvents:UIControlEventTouchUpInside];
-}
-
--(IBAction)buttonsAction:(UIButton *)sender
-{
-    UIViewController *nextController;
-    UIModalTransitionStyle transitionStyle;
-    
-    switch (sender.tag) {
-        case FHGTagCMVCaptureButton :
-            NSLog(@"Hello");
-            break;
-            
-        case FHGTagCMVSettingsButton :
-            nextController  = [[FHGExperimentParametersViewController alloc] init];
-            transitionStyle = UIModalTransitionStyleCoverVertical;
-            
-            NSLog(@"Settings");
-            break;
-            
-        case FHGTagCMVExitButton :
-            [self dismissViewControllerAnimated:YES completion:nil];
-            break;
-            
-        default :
-            FHG_TAG_NOT_HANDLED;
-    }
-    
-    if (nextController == nil)
-        return;
-    
-    UINavigationController *const navigationController = [[UINavigationController alloc] initWithRootViewController:nextController];
-    
-    [navigationController setModalPresentationStyle:UIModalPresentationFullScreen];
-    [navigationController setModalTransitionStyle:transitionStyle];
-    
-    [self presentViewController:navigationController animated:YES completion:nil];
 }
 
 #pragma mark - Navigation methods
@@ -285,6 +343,19 @@
 - (UIStatusBarAnimation)preferredStatusBarUpdateAnimation
 {
     return UIStatusBarAnimationFade;
+}
+
+#pragma mark - Experiment Data Dictionary methods
+- (void)setExperimentDataDict:(NSDictionary *)dict
+{
+    _experimentDataDict = dict;
+    
+    UIButton *const captureButton = (UIButton *)[_contentView viewWithTag:FHGTagCMVCaptureButton];
+    
+    [captureButton setTintColor:[UIColor redColor]];
+    
+    [captureButton setShowsTouchWhenHighlighted:YES];
+    [captureButton setAdjustsImageWhenHighlighted:YES];
 }
 
 /*

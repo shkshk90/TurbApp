@@ -7,6 +7,12 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		E00FF4BA22301F16008E45E8 /* UIViewController+UIViewController_FHGViewAddition.m in Sources */ = {isa = PBXBuildFile; fileRef = E00FF4B922301F16008E45E8 /* UIViewController+UIViewController_FHGViewAddition.m */; };
+		E00FF4BF223056B9008E45E8 /* AlbumsViewCell.m in Sources */ = {isa = PBXBuildFile; fileRef = E00FF4BE223056B9008E45E8 /* AlbumsViewCell.m */; };
+		E00FF4C222305756008E45E8 /* GridViewCell.m in Sources */ = {isa = PBXBuildFile; fileRef = E00FF4C122305756008E45E8 /* GridViewCell.m */; };
+		E00FF4C5223057D7008E45E8 /* AlbumsViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = E00FF4C4223057D7008E45E8 /* AlbumsViewController.m */; };
+		E00FF4C822305854008E45E8 /* GridViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = E00FF4C722305854008E45E8 /* GridViewController.m */; };
+		E00FF4CB223058DA008E45E8 /* MediaPickerController.m in Sources */ = {isa = PBXBuildFile; fileRef = E00FF4CA223058DA008E45E8 /* MediaPickerController.m */; };
 		E028A511222D533F00401A84 /* CameraPreviewSubView.m in Sources */ = {isa = PBXBuildFile; fileRef = E028A510222D533F00401A84 /* CameraPreviewSubView.m */; };
 		E028A515222D541100401A84 /* CameraMeasurementView.m in Sources */ = {isa = PBXBuildFile; fileRef = E028A514222D541100401A84 /* CameraMeasurementView.m */; };
 		E028A519222D6DA900401A84 /* RoiGestureHandler.m in Sources */ = {isa = PBXBuildFile; fileRef = E028A518222D6DA900401A84 /* RoiGestureHandler.m */; };
@@ -44,6 +50,18 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		E00FF4B822301F16008E45E8 /* UIViewController+UIViewController_FHGViewAddition.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "UIViewController+UIViewController_FHGViewAddition.h"; sourceTree = "<group>"; };
+		E00FF4B922301F16008E45E8 /* UIViewController+UIViewController_FHGViewAddition.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = "UIViewController+UIViewController_FHGViewAddition.m"; sourceTree = "<group>"; };
+		E00FF4BD223056B9008E45E8 /* AlbumsViewCell.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AlbumsViewCell.h; sourceTree = "<group>"; };
+		E00FF4BE223056B9008E45E8 /* AlbumsViewCell.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = AlbumsViewCell.m; sourceTree = "<group>"; };
+		E00FF4C022305756008E45E8 /* GridViewCell.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = GridViewCell.h; sourceTree = "<group>"; };
+		E00FF4C122305756008E45E8 /* GridViewCell.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = GridViewCell.m; sourceTree = "<group>"; };
+		E00FF4C3223057D7008E45E8 /* AlbumsViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AlbumsViewController.h; sourceTree = "<group>"; };
+		E00FF4C4223057D7008E45E8 /* AlbumsViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = AlbumsViewController.m; sourceTree = "<group>"; };
+		E00FF4C622305854008E45E8 /* GridViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = GridViewController.h; sourceTree = "<group>"; };
+		E00FF4C722305854008E45E8 /* GridViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = GridViewController.m; sourceTree = "<group>"; };
+		E00FF4C9223058DA008E45E8 /* MediaPickerController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = MediaPickerController.h; sourceTree = "<group>"; };
+		E00FF4CA223058DA008E45E8 /* MediaPickerController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = MediaPickerController.m; sourceTree = "<group>"; };
 		E028A50F222D533F00401A84 /* CameraPreviewSubView.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CameraPreviewSubView.h; sourceTree = "<group>"; };
 		E028A510222D533F00401A84 /* CameraPreviewSubView.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = CameraPreviewSubView.m; sourceTree = "<group>"; };
 		E028A513222D541100401A84 /* CameraMeasurementView.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CameraMeasurementView.h; sourceTree = "<group>"; };
@@ -112,6 +130,48 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		E00FF4B622301D22008E45E8 /* ViewsResources */ = {
+			isa = PBXGroup;
+			children = (
+				E07CB790222C1AD00083CEAE /* views_common.h */,
+				E07CB792222C21500083CEAE /* views_resources.h */,
+			);
+			name = ViewsResources;
+			sourceTree = "<group>";
+		};
+		E00FF4B722301D41008E45E8 /* ControllersResources */ = {
+			isa = PBXGroup;
+			children = (
+				E00FF4B822301F16008E45E8 /* UIViewController+UIViewController_FHGViewAddition.h */,
+				E00FF4B922301F16008E45E8 /* UIViewController+UIViewController_FHGViewAddition.m */,
+			);
+			name = ControllersResources;
+			sourceTree = "<group>";
+		};
+		E00FF4BB22305665008E45E8 /* GalleryMediaPicker */ = {
+			isa = PBXGroup;
+			children = (
+				E00FF4BD223056B9008E45E8 /* AlbumsViewCell.h */,
+				E00FF4BE223056B9008E45E8 /* AlbumsViewCell.m */,
+				E00FF4C022305756008E45E8 /* GridViewCell.h */,
+				E00FF4C122305756008E45E8 /* GridViewCell.m */,
+			);
+			name = GalleryMediaPicker;
+			sourceTree = "<group>";
+		};
+		E00FF4BC22305671008E45E8 /* GalleryMediaPicker */ = {
+			isa = PBXGroup;
+			children = (
+				E00FF4C3223057D7008E45E8 /* AlbumsViewController.h */,
+				E00FF4C4223057D7008E45E8 /* AlbumsViewController.m */,
+				E00FF4C622305854008E45E8 /* GridViewController.h */,
+				E00FF4C722305854008E45E8 /* GridViewController.m */,
+				E00FF4C9223058DA008E45E8 /* MediaPickerController.h */,
+				E00FF4CA223058DA008E45E8 /* MediaPickerController.m */,
+			);
+			name = GalleryMediaPicker;
+			sourceTree = "<group>";
+		};
 		E028A50C222D52C400401A84 /* FirstScreen */ = {
 			isa = PBXGroup;
 			children = (
@@ -221,12 +281,12 @@
 		E07CB786222C114F0083CEAE /* Views */ = {
 			isa = PBXGroup;
 			children = (
+				E00FF4B622301D22008E45E8 /* ViewsResources */,
 				E07CB78C222C18D70083CEAE /* FirstScreen */,
 				E028A512222D534500401A84 /* CameraMeasurement */,
 				E0A38371222EE4A7004392C4 /* StorageMeasurement */,
+				E00FF4BB22305665008E45E8 /* GalleryMediaPicker */,
 				E0479F20222DA1C4008C7151 /* ExperimentParameters */,
-				E07CB790222C1AD00083CEAE /* views_common.h */,
-				E07CB792222C21500083CEAE /* views_resources.h */,
 			);
 			path = Views;
 			sourceTree = "<group>";
@@ -234,10 +294,12 @@
 		E07CB787222C11540083CEAE /* Controllers */ = {
 			isa = PBXGroup;
 			children = (
+				E00FF4B722301D41008E45E8 /* ControllersResources */,
 				E028A50C222D52C400401A84 /* FirstScreen */,
 				E028A50E222D52D500401A84 /* CameraMeasurement */,
 				E0A6F409222EA1A2004E9111 /* ExperimentParameters */,
 				E0A38376222F086E004392C4 /* StorageMeasurement */,
+				E00FF4BC22305671008E45E8 /* GalleryMediaPicker */,
 				E028A51A222D759A00401A84 /* RoiGestureHandlerClass */,
 			);
 			path = Controllers;
@@ -434,14 +496,20 @@
 			buildActionMask = 2147483647;
 			files = (
 				E07CB758222C0F450083CEAE /* FirstScreenViewController.m in Sources */,
+				E00FF4CB223058DA008E45E8 /* MediaPickerController.m in Sources */,
 				E0A38374222EE509004392C4 /* StorageMeasurementView.m in Sources */,
 				E07CB763222C0F470083CEAE /* main.m in Sources */,
+				E00FF4C222305756008E45E8 /* GridViewCell.m in Sources */,
+				E00FF4C5223057D7008E45E8 /* AlbumsViewController.m in Sources */,
+				E00FF4C822305854008E45E8 /* GridViewController.m in Sources */,
 				E0A38379222F0889004392C4 /* StorageMeasurementViewController.m in Sources */,
 				E07CB755222C0F450083CEAE /* AppDelegate.m in Sources */,
+				E00FF4BA22301F16008E45E8 /* UIViewController+UIViewController_FHGViewAddition.m in Sources */,
 				E0479F23222DA202008C7151 /* ExperimentParametersView.m in Sources */,
 				E07CB78F222C19090083CEAE /* FirstScreenView.m in Sources */,
 				E028A515222D541100401A84 /* CameraMeasurementView.m in Sources */,
 				E028A519222D6DA900401A84 /* RoiGestureHandler.m in Sources */,
+				E00FF4BF223056B9008E45E8 /* AlbumsViewCell.m in Sources */,
 				E0A6F40C222EA1C0004E9111 /* ExperimentParametersViewController.m in Sources */,
 				E043583C222D5166007F737A /* CameraMeasurementViewController.m in Sources */,
 				E028A511222D533F00401A84 /* CameraPreviewSubView.m in Sources */,

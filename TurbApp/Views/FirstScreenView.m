@@ -17,7 +17,7 @@
 #pragma mark - Implementation
 @implementation FHGFirstScreenView {
 
-@private CGRect           _bounds;
+//@private CGRect           _bounds;
 @private UILayoutGuide   *_guide;
 
 @private UIImageView     *_backgroundImageView;
@@ -37,7 +37,7 @@
         return nil;
     
     _guide  = superView.safeAreaLayoutGuide;
-    _bounds = [UIScreen mainScreen].bounds;
+//    _bounds = [UIScreen mainScreen].bounds;
     
     _backgroundImageView = [[UIImageView alloc] init];
     _mainStackView       = [[UIStackView alloc] init];
@@ -64,6 +64,46 @@
     return self;
 }
 
+- (id)init
+{
+    self = [super init];
+    if (self == nil)
+        return nil;
+
+    [self setOpaque:YES];
+    
+    _backgroundImageView = [[UIImageView alloc] init];
+    _mainStackView       = [[UIStackView alloc] init];
+    
+    _recordButton        = [UIButton buttonWithType:UIButtonTypeSystem];
+    _videoButton         = [UIButton buttonWithType:UIButtonTypeSystem];
+
+    
+    [self setupButton:_videoButton  withTag:FHGTagFSVVideoButton];
+    [self setupButton:_recordButton withTag:FHGTagFSVRecordButton];
+    
+    
+    [_mainStackView setSpacing:5.];
+    [_mainStackView setAxis:UILayoutConstraintAxisVertical];
+    [_mainStackView setDistribution:UIStackViewDistributionFillEqually];
+    
+    [_mainStackView addArrangedSubview:_recordButton];
+    [_mainStackView addArrangedSubview:_videoButton];
+    
+    
+    return self;
+}
+
+- (void)createMainViewWithSafeLayoutGuide:(UILayoutGuide *const)guide
+{
+    _guide  = guide;
+    
+    [self addSubview:_backgroundImageView];
+    [self addSubview:_mainStackView];
+    
+    [self setupConstraits];
+}
+
 - (UIView *)viewWithTag:(const NSInteger)tag
 {
     switch ((FHGTagFirstScreen)tag) {
@@ -82,14 +122,28 @@
 }
 
 #pragma mark - Setup views methods
+- (void)setupConstraits
+{
+    [self setTranslatesAutoresizingMaskIntoConstraints:NO];
+    //
+    [[self.leadingAnchor  constraintEqualToAnchor:_guide.leadingAnchor] setActive:YES];
+    [[self.trailingAnchor constraintEqualToAnchor:_guide.trailingAnchor] setActive:YES];
+    [[self.topAnchor      constraintEqualToAnchor:_guide.topAnchor] setActive:YES];
+    [[self.bottomAnchor   constraintEqualToAnchor:_guide.bottomAnchor] setActive:YES];
+    
+    
+    [self setupImageView];
+    [self setupMainStackView];
+}
+
 - (void)setupImageView
 {
     [_backgroundImageView setTranslatesAutoresizingMaskIntoConstraints:NO];
     //
-    [[_backgroundImageView.leadingAnchor constraintEqualToAnchor:_guide.leadingAnchor] setActive:YES];
-    [[_backgroundImageView.trailingAnchor constraintEqualToAnchor:_guide.trailingAnchor] setActive:YES];
-    [[_backgroundImageView.topAnchor constraintEqualToAnchor:_guide.topAnchor] setActive:YES];
-    [[_backgroundImageView.bottomAnchor constraintEqualToAnchor:_guide.bottomAnchor] setActive:YES];
+    [[_backgroundImageView.leadingAnchor constraintEqualToAnchor:self.leadingAnchor] setActive:YES];
+    [[_backgroundImageView.trailingAnchor constraintEqualToAnchor:self.trailingAnchor] setActive:YES];
+    [[_backgroundImageView.topAnchor constraintEqualToAnchor:self.topAnchor] setActive:YES];
+    [[_backgroundImageView.bottomAnchor constraintEqualToAnchor:self.bottomAnchor] setActive:YES];
     
     [_backgroundImageView setImage:[UIImage imageNamed:FSV_IMAGEVIEW_RES]];
     [_backgroundImageView setAlpha:0.8];
@@ -101,15 +155,15 @@
 
 - (void)setupMainStackView
 {
-    const CGFloat verticalSpacing    = fhgv_getPercentageOfScreenHeight(_bounds, kFSVVerticalPercentage);
-    const CGFloat horizontalSpacing  = fhgv_getPercentageOfScreenWidth( _bounds, kFSVHorizontalPercentage);
+    const CGFloat verticalSpacing    = FHGV_SCREEN_HEIGHT(kFSVVerticalPercentage);  //fhgv_getPercentageOfScreenHeight(_bounds, kFSVVerticalPercentage);
+    const CGFloat horizontalSpacing  = FHGV_SCREEN_WIDTH(kFSVHorizontalPercentage); //fhgv_getPercentageOfScreenWidth( _bounds, kFSVHorizontalPercentage);
     
     [_mainStackView setTranslatesAutoresizingMaskIntoConstraints:NO];
     
-    [[_mainStackView.leadingAnchor constraintEqualToAnchor:_guide.leadingAnchor constant:horizontalSpacing] setActive:YES];
-    [[_mainStackView.trailingAnchor constraintEqualToAnchor:_guide.trailingAnchor constant:-horizontalSpacing] setActive:YES];
-    [[_mainStackView.topAnchor constraintEqualToAnchor:_guide.topAnchor constant:verticalSpacing] setActive:YES];
-    [[_mainStackView.bottomAnchor constraintEqualToAnchor:_guide.bottomAnchor constant:-verticalSpacing] setActive:YES];
+    [[_mainStackView.leadingAnchor constraintEqualToAnchor:self.leadingAnchor constant:horizontalSpacing] setActive:YES];
+    [[_mainStackView.trailingAnchor constraintEqualToAnchor:self.trailingAnchor constant:-horizontalSpacing] setActive:YES];
+    [[_mainStackView.topAnchor constraintEqualToAnchor:self.topAnchor constant:verticalSpacing] setActive:YES];
+    [[_mainStackView.bottomAnchor constraintEqualToAnchor:self.bottomAnchor constant:-verticalSpacing] setActive:YES];
     
     [_mainStackView setSpacing:verticalSpacing];
     [_mainStackView setDistribution:UIStackViewDistributionFillEqually];
@@ -122,11 +176,11 @@
 
 - (void)setupButton:(UIButton *)button withTag:(const FHGTagFirstScreen)tag
 {
-    const CGFloat fontSize            = (CGFloat)fhgv_getPercentageOfScreenHeight(_bounds, 5);
+    const CGFloat fontSize            = FHGV_SCREEN_HEIGHT(5.); //(CGFloat)fhgv_getPercentageOfScreenHeight(_bounds, 5);
     
-    const CGFloat leftInsetForImage   = (CGFloat)fhgv_getPercentageOfScreenWidth(_bounds, 3);
-    const CGFloat rightInsetForImage  = (CGFloat)fhgv_getPercentageOfScreenWidth(_bounds, 15);
-    const CGFloat leftInsetForText    = (CGFloat)fhgv_getPercentageOfScreenWidth(_bounds, 24);
+    const CGFloat leftInsetForImage   = FHGV_SCREEN_WIDTH(3.);  //(CGFloat)fhgv_getPercentageOfScreenWidth(_bounds, 3);
+    const CGFloat rightInsetForImage  = FHGV_SCREEN_WIDTH(15.); //(CGFloat)fhgv_getPercentageOfScreenWidth(_bounds, 15);
+    const CGFloat leftInsetForText    = FHGV_SCREEN_WIDTH(24.); //(CGFloat)fhgv_getPercentageOfScreenWidth(_bounds, 24);
     
     UIImage  *image;
     UIColor  *color;
@@ -186,11 +240,7 @@
     [button setUserInteractionEnabled:YES];
 }
 
-- (void)setupConstraits
-{
-    [self setupImageView];
-    [self setupMainStackView];
-}
+
 
 /*
 // Only override drawRect: if you perform custom drawing.

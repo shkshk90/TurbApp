@@ -19,7 +19,7 @@ static const CGFloat kFSVNavigationBarPercentage = 10.;
 static const CGFloat kFSVVerticalPercentage   = 15.;
 static const CGFloat kFSVHorizontalPercentage = 5.;
 
-#define FSV_IMAGEVIEW_RES @"FSV_Background"
+#define FSV_IMAGEVIEW_RES     @"FSV_Background"
 
 #define FSV_RECORDBTN_IMG_RES @"FSV_LiveCapture"
 #define FSV_VIDEOBTN_IMG_RES  @"FSV_SelectVideo"
@@ -86,17 +86,19 @@ static const CGFloat kSMVViewSpacingPercentage    = 5.;
 
 static const CGFloat kSMVCn2SpacingPercentage = 25.;
 
-#define SMV_STEP1_TXT_RES   @"1. Select Video to Process"
-#define SMV_STEP2_TXT_RES   @"2. Set Parameters"
-#define SMV_STEP3_TXT_RES   @"3. Calculate Cn2"
+#define SMV_STEP1_TXT_RES       @"1. Select Video to Process:"
+#define SMV_STEP2_TXT_RES       @"2. Set Parameters:"
+#define SMV_STEP3_TXT_RES       @"3. Calculate Cn2:"
 
-#define SMV_LABELS_FONT_RES @"GillSans"
+#define SMV_LABELS_FONT_RES     @"GillSans"
 
-#define SMV_PREVIEW_IMG_RES @"SMV_DefaultPreview"
+#define SMV_PREVIEW_IMG_RES     @"SMV_DefaultPreview"
 
-#define SMV_RESTART_ICN_RES  @"SMV_Restart"
-#define SMV_SETTINGS_ICN_RES @"SMV_Settings"
-#define SMV_LAUNCH_ICN_RES   @"SMV_Launch"
+#define SMV_RESTART_ICN_RES     @"SMV_Restart"
+#define SMV_SETTINGS_ICN_RES    @"SMV_Settings"
+#define SMV_LAUNCH_ICN_RES      @"SMV_Launch"
+
+#define SMV_BACKBUTTON_IMG_RES  @"SMV_BackButton"
 /**********************************************************************/
 
 

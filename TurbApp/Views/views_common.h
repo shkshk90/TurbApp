@@ -11,7 +11,8 @@
 
 @protocol FHGViewsProtocol <NSObject>
 
-- (id)initWithContentView:(UIView *const)superView;
+//- (id)initWithContentView:(UIView *const)superView;
+- (void)createMainViewWithSafeLayoutGuide:(UILayoutGuide *const)guide;
 - (UIView *)viewWithTag:(const NSInteger)tag;
 
 - (void)setButtonsTarget:(UIViewController *const)target withSelector:(const SEL)selector;

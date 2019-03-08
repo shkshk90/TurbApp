@@ -13,7 +13,9 @@ NS_ASSUME_NONNULL_BEGIN
 
 @interface FHGFirstScreenView : UIView <FHGViewsProtocol>
 
-- (id)initWithContentView:(UIView *const)superView;
+//- (id)initWithContentView:(UIView *const)superView;
+- (id)init;
+- (void)createMainViewWithSafeLayoutGuide:(UILayoutGuide *const)guide;
 - (UIView *)viewWithTag:(const NSInteger)tag;
 - (void)setButtonsTarget:(UIViewController *const)target withSelector:(const SEL)selector;
 @end

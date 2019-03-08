@@ -29,10 +29,7 @@
 @private CATextLayer                *_instructionsLayer;
     
 @private UILayoutGuide              *_guide;
-@private CGRect                      _bounds;
     
-    
-
 }
 
 #pragma mark - Public methods
@@ -44,7 +41,7 @@
         return nil;
     
     _guide          = superView.safeAreaLayoutGuide;
-    _bounds         = [UIScreen mainScreen].bounds;
+//    _bounds         = [UIScreen mainScreen].bounds;
     
     _cameraView     = [[FHGCameraPreviewSubView alloc] init];
     
@@ -67,7 +64,37 @@
     return self;
 }
 
-- (UIView *)viewWithTag:(const NSInteger)tag {
+- (id)init
+{
+    self = [super init];
+    if (self == nil)
+        return nil;
+    
+    [self setOpaque:YES];
+    
+    _cameraView     = [[FHGCameraPreviewSubView alloc] init];
+    
+    _exitButton     = [UIButton buttonWithType:UIButtonTypeSystem];
+    _settingsButton = [UIButton buttonWithType:UIButtonTypeSystem];
+    _captureButton  = [UIButton buttonWithType:UIButtonTypeCustom];
+    
+    _roiLayer           = [CALayer layer];
+    _instructionsLayer  = [CATextLayer layer];
+    
+    return self;
+}
+
+- (void)createMainViewWithSafeLayoutGuide:(UILayoutGuide *const)guide
+{
+    _guide = guide;
+    
+    [self setupViews];
+    [self buildMainView];
+    [self setupAllConstraints];
+}
+
+- (UIView *)viewWithTag:(const NSInteger)tag
+{
     switch ((FHGTagCameraMeasurement)tag) {
         case FHGTagCMVCameraView     : return _cameraView;
         case FHGTagCMVExitButton     : return _exitButton;
@@ -89,34 +116,9 @@
     return _roiLayer;
 }
 
-#pragma mark - Public Configuration methods
-- (void)updateTextLayer
+- (CATextLayer *)instructionsLayer
 {
-    const CGRect  r = _settingsButton.frame;
-    
-    const CGFloat x = r.origin.x;
-    const CGFloat y = CGRectGetMinY(r) - CGRectGetHeight(r);
-    
-    const CGFloat w = fhgv_getPercentageOfScreenWidth(_bounds, 50.);
-    const CGFloat h = CGRectGetHeight(r) * .5;
-    
-    [_instructionsLayer setString:CMV_INSTRUCTIONS_TXT_RES];
-    [_instructionsLayer setAlignmentMode:kCAAlignmentCenter];
-    
-    [_instructionsLayer setFont:CTFontCreateWithName((__bridge CFStringRef)@"Optima-Regular" , 18., NULL)];
-    [_instructionsLayer setFontSize:18.];
-    
-    [_instructionsLayer setWrapped:YES];
-    [_instructionsLayer setAllowsFontSubpixelQuantization:YES];
-    
-    [_instructionsLayer setForegroundColor:[UIColor orangeColor].CGColor];
-    [_instructionsLayer setBackgroundColor:[UIColor darkGrayColor].CGColor];
-    
-    [_instructionsLayer setFrame:CGRectMake(x, y, w, h)];
-    [_instructionsLayer setShouldRasterize:YES];
-    [_instructionsLayer setRasterizationScale:[UIScreen mainScreen].scale];
-    
-    [_instructionsLayer setOpacity:NO];
+    return _instructionsLayer;
 }
 
 #pragma mark - General methods
@@ -138,8 +140,8 @@
     [_cameraView addSubview:_settingsButton];
     [_cameraView addSubview:_captureButton];
     
-    [_cameraView.layer addSublayer:_instructionsLayer];
     [_cameraView.layer addSublayer:_roiLayer];
+    [_cameraView.layer addSublayer:_instructionsLayer];
 }
 
 -(void)setupAllConstraints
@@ -187,7 +189,10 @@
             
         case FHGTagCMVCaptureButton:
             image  = [[UIImage imageNamed:CMV_CAPTUREBTN_IMG_RES] imageWithRenderingMode:UIImageRenderingModeAlwaysTemplate];
-            color  = [UIColor grayColor];
+            color  = [UIColor lightGrayColor];
+            
+            [button setShowsTouchWhenHighlighted:NO];
+            [button setAdjustsImageWhenHighlighted:NO];
             
             break;
             
@@ -200,22 +205,44 @@
     [button setTitle:@""   forState:UIControlStateNormal];
     [button setImage:image forState:UIControlStateNormal];
     
-    [button setShowsTouchWhenHighlighted:(tag != FHGTagCMVCaptureButton)];
-    
     [button setContentVerticalAlignment:UIControlContentVerticalAlignmentFill];
     [button setContentHorizontalAlignment:UIControlContentHorizontalAlignmentFill];
 }
 
 - (void)configureTextLayer
 {
+    const CGFloat x = FHGV_SCREEN_WIDTH(5.);
+    const CGFloat y = FHGV_SCREEN_HEIGHT(75.);
+    const CGFloat w = FHGV_SCREEN_WIDTH(40.);
+    const CGFloat h = FHGV_SCREEN_HEIGHT(4.);
+    
+    [_instructionsLayer setString:CMV_INSTRUCTIONS_TXT_RES];
+    [_instructionsLayer setAlignmentMode:kCAAlignmentCenter];
+    
+    [_instructionsLayer setAllowsFontSubpixelQuantization:YES];
+    [_instructionsLayer setFont:CTFontCreateWithName((__bridge CFStringRef)@"Optima-Regular" , 18., NULL)];
+    [_instructionsLayer setFontSize:18.];
+    
+    [_instructionsLayer setWrapped:YES];
+    [_instructionsLayer setAllowsFontSubpixelQuantization:YES];
+    
+    [_instructionsLayer setForegroundColor:[UIColor redColor].CGColor];
+    [_instructionsLayer setBackgroundColor:[UIColor whiteColor].CGColor];
+    
+    [_instructionsLayer setFrame:CGRectMake(x, y, w, h)];
+    [_instructionsLayer setShouldRasterize:YES];
+    [_instructionsLayer setRasterizationScale:[UIScreen mainScreen].scale];
+    
+    [_instructionsLayer setOpacity:1.];
     [_instructionsLayer setHidden:YES];
 }
 
-
 - (void)configureRoiLayer
 {
-    const CGFloat roiX   = (CGRectGetWidth(_bounds)  / 2.) - 25.;
-    const CGFloat roiY   = (CGRectGetHeight(_bounds) / 2.) - 25.;
+    const CGRect  bounds = [UIScreen mainScreen].bounds;
+    
+    const CGFloat roiX   = (CGRectGetWidth( bounds) / 2.) - 25.;
+    const CGFloat roiY   = (CGRectGetHeight(bounds) / 2.) - 25.;
     
     [_roiLayer setBorderWidth:2.];
     [_roiLayer setBorderColor:[UIColor orangeColor].CGColor];
@@ -250,9 +277,9 @@
 
 - (void)setupConstraintsForButton:(UIButton *const)button WithTag:(const FHGTagCameraMeasurement)tag
 {
-    const CGFloat screen50pWidth  = fhgv_getPercentageOfScreenWidth(_bounds, 50.);
-    const CGFloat screen95pHeight = fhgv_getPercentageOfScreenHeight(_bounds, 95.);
-    const CGFloat screen05pWidth  = fhgv_getPercentageOfScreenWidth(_bounds, 5.);
+    const CGFloat screen50pWidth  = FHGV_SCREEN_WIDTH(50.); //fhgv_getPercentageOfScreenWidth(_bounds, 50.);
+    const CGFloat screen95pHeight = FHGV_SCREEN_HEIGHT(95.); //fhgv_getPercentageOfScreenHeight(_bounds, 95.);
+    const CGFloat screen05pWidth  = FHGV_SCREEN_WIDTH(5.); //fhgv_getPercentageOfScreenWidth(_bounds, 5.);
     
     CGFloat x;
     CGFloat y;
@@ -264,21 +291,21 @@
         case FHGTagCMVExitButton:
             x = 0.;
             y = 0.;
-            buttonSide   = fhgv_getPercentageOfScreenWidth(_bounds, kCMVExitSideP);
+            buttonSide   = FHGV_SCREEN_WIDTH(kCMVExitSideP); //fhgv_getPercentageOfScreenWidth(_bounds, kCMVExitSideP);
             imageInsets  = UIEdgeInsetsMake(buttonSide/2.5, buttonSide/2.5, 0., 0.);
             
             break;
             
         case FHGTagCMVSettingsButton:
-            buttonSide = fhgv_getPercentageOfScreenWidth(_bounds, kCMVSettSideP);
-            temp = fhgv_getPercentageOfScreenWidth(_bounds, kCMVCaptSideP);
+            buttonSide = FHGV_SCREEN_WIDTH(kCMVSettSideP); //fhgv_getPercentageOfScreenWidth(_bounds, kCMVSettSideP);
+            temp       = FHGV_SCREEN_WIDTH(kCMVCaptSideP); //fhgv_getPercentageOfScreenWidth(_bounds, kCMVCaptSideP);
             x = screen50pWidth - (temp / 2.) - buttonSide - screen05pWidth;
             y = screen95pHeight - temp + ((temp - buttonSide) / 2.);
             
             break;
             
         case FHGTagCMVCaptureButton:
-            buttonSide   = fhgv_getPercentageOfScreenWidth(_bounds, kCMVCaptSideP);
+            buttonSide = FHGV_SCREEN_WIDTH(kCMVCaptSideP); //fhgv_getPercentageOfScreenWidth(_bounds, kCMVCaptSideP);
             x = screen50pWidth - (buttonSide / 2.);
             y = screen95pHeight - buttonSide;
             

@@ -13,6 +13,7 @@
 #import "../common.h"
 #import "../Views/FirstScreenView.h"
 #import "../Views/FirstScreen_common.h"
+#import "UIViewController+UIViewController_FHGViewAddition.h"
 
 
 #pragma mark - Interface
@@ -33,7 +34,10 @@
     // Do any additional setup after loading the view, typically from a nib.
     [self configureNavigation];
     
-    _firstScreenView = [[FHGFirstScreenView alloc] initWithContentView:self.view];
+    //_firstScreenView = [[FHGFirstScreenView alloc] initWithContentView:self.view];
+    _firstScreenView = [[FHGFirstScreenView alloc] init];
+    
+    [self fhg_addMainSubView:_firstScreenView];
     [_firstScreenView setButtonsTarget:self withSelector:@selector(routeView:)];
 }
 
@@ -49,13 +53,11 @@
     UIViewController *nextController;
     switch (sender.tag) {
         case FHGTagFSVRecordButton:
-            NSLog(@"Ying");
             nextController = [[FHGCameraMeasurementViewController alloc] init];
             
             break;
             
         case FHGTagFSVVideoButton:
-            NSLog(@"Yang");
             nextController = [[FHGStorageMeasurementViewController alloc] init];
             
             break;

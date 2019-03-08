@@ -13,7 +13,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 @interface FHGExperimentParametersViewController : UIViewController
 
-@property (weak, nonatomic) id<ExperimentDataProtocol> delegate;
+@property (weak, nonatomic) id<FHGProtocolExperimentParametersDelegate> delegate;
 
 @end
 

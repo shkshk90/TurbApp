@@ -67,6 +67,27 @@
     return self;
 }
 
+- (id)init
+{
+    self = [super init];
+    if (self == nil)
+        return nil;
+    
+    [self initAllViews];
+    [self initVariables];
+    
+    return self;
+}
+
+- (void)createMainViewWithSafeLayoutGuide:(UILayoutGuide *const)guide
+{
+    _guide = guide;
+    
+    [self setupViews];
+    [self buildMainView];
+    [self setupAllConstraints];
+}
+
 - (UIView *)viewWithTag:(const NSInteger)tag
 {
     switch ((FHGTagExperimentParametersViews)tag) {

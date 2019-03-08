@@ -10,6 +10,7 @@
 #import "../Views/ExperimentParametersView.h"
 #import "../Views/ExperimentParameters_common.h"
 #import "../common.h"
+#import "UIViewController+UIViewController_FHGViewAddition.h"
 
 #pragma mark - Interface
 @interface FHGExperimentParametersViewController () <UITextFieldDelegate>
@@ -28,7 +29,6 @@
 @private BOOL                           _lengthIsHeight;
 
 @private BOOL                           _hideStatusBar;
-@private BOOL                           _dataIsAvailable;
     
 @private CGFloat                        _distanceInMeters;
 @private CGFloat                        _apertureInMillimeters;
@@ -53,7 +53,6 @@
     _lengthIsHeight         = NO;
     
     _hideStatusBar          = YES;
-    _dataIsAvailable        = NO;
 
     
     _distanceInMeters       = 0.;
@@ -64,8 +63,8 @@
     
     _blockInPixels          = 32;
     
-    
-    _contentView = [[FHGExperimentParametersView alloc] initWithContentView:self.view];
+    _contentView = [[FHGExperimentParametersView alloc] init];
+    [self fhg_addMainSubView:_contentView];
     
     [_contentView setButtonsTarget:self withSelector:@selector(segmentedControlValueChanged:)];
     [_contentView setTextFieldDelegateAndTarget:self withSelector:@selector(checkTextField:)];
@@ -74,8 +73,12 @@
     [self configureNavigation];
     [self registerForKeyboardNotifications];
     
-//    [self.view addSubview:_contentView];
     [self.view addGestureRecognizer:[[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(dismissKeyboard)]];
+    
+    [self.navigationItem.rightBarButtonItem setEnabled:NO];
+    
+    if ([self retrieveDataFromDelegate])
+        [self updateViewWithData];
 }
 
 - (void)viewWillAppear:(BOOL)animated
@@ -98,44 +101,71 @@
     [_contentView fillTextField:FHGTagEPVTextFieldSamplesCount  withData:_samplesCountOverTen];
     
     [_contentView updateSegmentedControl:FHGTagEPVSegControlLength    withValue:_lengthIsHeight];
-    [_contentView updateSegmentedControl:FHGTagEPVSegControlBlockSize withValue:_lengthIsHeight];
+    [_contentView updateSegmentedControl:FHGTagEPVSegControlBlockSize withValue:_blockInPixels];
     
     
     [self.navigationItem.rightBarButtonItem setEnabled:YES];
 }
 
-#pragma mark - Dict
-- (void)updateDataWithDict:(NSDictionary *)dict
+#pragma mark - Data Save and Retrieval
+- (BOOL)retrieveDataFromDelegate
 {
-    const NSNumber *distanceValue = (NSNumber *)[dict objectForKey:@"Distance"];
-    const NSNumber *apertureValue = (NSNumber *)[dict objectForKey:@"Aperture"];
+    NSDictionary *const dict = _delegate.experimentDataDict;
     
-    const NSNumber *typeValue   = (NSNumber *)[dict objectForKey:@"Type"];
-    const NSNumber *lengthValue   = (NSNumber *)[dict objectForKey:@"Length"];
+    if ((dict == nil) || ([dict count] == 0))
+        return NO;
     
-    const NSNumber *blockValue    = (NSNumber *)[dict objectForKey:@"Block"];
+    /*
+     #define FHGK_EXP_PARAM_DISTANCE_TO_TARGET       @"Distance To Target"
+     #define FHGK_EXP_PARAM_APERTURE_SIZE            @"Aperture"
+     #define FHGK_EXP_PARAM_LENGTH_OF_SCENE          @"Scene Length"
+     #define FHGK_EXP_PARAM_BLOCK_SIZE               @"Block Size"
+     #define FHGK_EXP_PARAM_NUMBER_OF_SAMPLES        @"Samples Count"
+     #define FHGK_EXP_PARAM_TYPE_OF_LENGTH           @"Length Type"
+     */
+    
+    NSNumber *const distanceValue = (NSNumber *)[dict objectForKey:FHGK_EXP_PARAM_DISTANCE_TO_TARGET];
+    NSNumber *const apertureValue = (NSNumber *)[dict objectForKey:FHGK_EXP_PARAM_APERTURE_SIZE];
+    
+    NSNumber *const pixelsValue   = (NSNumber *)[dict objectForKey:FHGK_EXP_PARAM_PIXELS_IN_SCENE];
+    NSNumber *const lengthValue   = (NSNumber *)[dict objectForKey:FHGK_EXP_PARAM_LENGTH_OF_SCENE];
+    
+    NSNumber *const blockValue    = (NSNumber *)[dict objectForKey:FHGK_EXP_PARAM_BLOCK_SIZE];
+    NSNumber *const samplesValue  = (NSNumber *)[dict objectForKey:FHGK_EXP_PARAM_NUMBER_OF_SAMPLES];
+    
     
     _distanceInMeters       = (CGFloat)[distanceValue doubleValue];
     _apertureInMillimeters  = (CGFloat)[apertureValue doubleValue];
     _lengthInMeters         = (CGFloat)[lengthValue   doubleValue];
     
-    _lengthIsHeight         = [typeValue boolValue];
-    _blockInPixels          = [blockValue  integerValue];
+    _lengthIsHeight         = fabs([pixelsValue  doubleValue] - _delegate.videoSize.height) < DBL_EPSILON ;
+    _blockInPixels          = [blockValue   integerValue];
+    _samplesCountOverTen    = [samplesValue doubleValue];
     
-    _dataIsAvailable        = YES;
+    return YES;
 }
 
-- (NSDictionary *)generateDataDict
+- (NSDictionary *const)generateDictWithExperimentData
 {
+    /*
+     #define FHGK_EXP_PARAM_DISTANCE_TO_TARGET       @"Distance To Target"
+     #define FHGK_EXP_PARAM_APERTURE_SIZE            @"Aperture"
+     #define FHGK_EXP_PARAM_LENGTH_OF_SCENE          @"Scene Length"
+     #define FHGK_EXP_PARAM_BLOCK_SIZE               @"Block Size"
+     #define FHGK_EXP_PARAM_NUMBER_OF_SAMPLES        @"Samples Count"
+     #define FHGK_EXP_PARAM_TYPE_OF_LENGTH           @"Length Type"
+     */
+    
     NSDictionary *const dictionary = @{
-                                       @"Distance"     : [NSNumber numberWithDouble:_distanceInMeters],
-                                       @"Aperture"     : [NSNumber numberWithDouble:_apertureInMillimeters],
-                                       
-                                       @"Type"         : [NSNumber numberWithBool:_lengthIsHeight],
-                                       @"Length"       : [NSNumber numberWithDouble:_lengthInMeters],
-                                       
-                                       @"Block"        : [NSNumber numberWithInteger:_blockInPixels],
-                                       };
+       FHGK_EXP_PARAM_DISTANCE_TO_TARGET : [NSNumber numberWithDouble:_distanceInMeters],
+       FHGK_EXP_PARAM_APERTURE_SIZE      : [NSNumber numberWithDouble:_apertureInMillimeters],
+       
+       FHGK_EXP_PARAM_PIXELS_IN_SCENE    : [NSNumber numberWithDouble:(_lengthIsHeight) ? _delegate.videoSize.height : _delegate.videoSize.width],
+       FHGK_EXP_PARAM_LENGTH_OF_SCENE    : [NSNumber numberWithDouble:_lengthInMeters],
+       
+       FHGK_EXP_PARAM_BLOCK_SIZE         : [NSNumber numberWithInteger:_blockInPixels],
+       FHGK_EXP_PARAM_NUMBER_OF_SAMPLES  : [NSNumber numberWithDouble:_samplesCountOverTen],
+    };
     
     return dictionary;
 }
@@ -148,12 +178,10 @@
     [self.navigationController.navigationBar setBarTintColor:[UIColor whiteColor]];
     
     [self.navigationItem setTitle:@"Parameters"];
-    [self.navigationItem setRightBarButtonItem:
-        [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemDone target:self action:@selector(cancel)]];
     [self.navigationItem setLeftBarButtonItem:
-        [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemCancel target:self action:@selector(done)]];
-    
-    NSLog(@"Navi: %d", self.navigationController == nil);
+        [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemCancel target:self action:@selector(cancel)]];
+    [self.navigationItem setRightBarButtonItem:
+     [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemDone target:self action:@selector(done)]];
 }
 
 - (IBAction)cancel
@@ -164,7 +192,8 @@
 
 - (IBAction)done
 {
-//    [self.delegate setExperimentDataWithDict:[self generateDataDict]];
+    [_delegate setExperimentDataDict:[self generateDictWithExperimentData]];
+    
     [self dismissKeyboard];
     [self dismissViewControllerAnimated:YES completion:nil];
 }

@@ -58,22 +58,45 @@
     return self;
 }
 
+- (id)init
+{
+    self = [super init];
+    if (self == nil)
+        return nil;
+    
+    [self initAllViews];
+    
+    return self;
+}
+
+- (void)createMainViewWithSafeLayoutGuide:(UILayoutGuide *const)guide
+{
+    _guide = guide;
+    
+    [self setupViews];
+    [self buildMainView];
+    [self setupAllConstraints];
+}
+
 - (UIView *)viewWithTag:(const NSInteger)tag
 {
     switch ((FHGTagStorageMeasurementSteps)tag) {
         case FHGTagSMVStepOne:   return _stepOneLabel;
         case FHGTagSMVStepTwo:   return _stepTwoLabel;
         case FHGTagSMVStepThree: return _stepThreeLabel;
+        default:                 break;
     }
     
     switch ((FHGTagStorageMeasurementButtonTags)tag) {
         case FHGTagSMVResetButton:    return _reselectButton;
         case FHGTagSMVSettingsButton: return _settingsButton;
         case FHGTagSMVLaunchButton:   return _launchButton;
+        default:                      break;
     }
     
     switch ((FHGTagStorageMeasurementViewsTags)tag) {
         case FHGTagSMVPreview: return _previewImageView;
+        default:               break;
     }
     
     FHG_TAG_NOT_HANDLED;
@@ -90,6 +113,27 @@
 - (CALayer *)roiLayer
 {
     return _roiLayer;
+}
+
+- (void)showRoiLayer
+{
+    const CGRect  previewFrame  = _previewImageView.frame;
+    
+    const CGFloat roiX          = (CGRectGetWidth( previewFrame) / 2.) - 25.;
+    const CGFloat roiY          = (CGRectGetHeight(previewFrame) / 2.) - 25.;
+    
+    [_roiLayer setFrame:CGRectMake(roiX, roiY, 50., 50.)];
+    [_roiLayer setHidden:NO];
+}
+
++ (UIImage *)goBackImage
+{
+    return [UIImage imageNamed:SMV_BACKBUTTON_IMG_RES];
+}
+
+- (void)showReselectButton:(const BOOL)notHidden
+{
+    [_reselectButton setHidden:!notHidden];
 }
 
 #pragma mark - Init methods
@@ -141,6 +185,7 @@
     
     [_mainStackView setAxis:UILayoutConstraintAxisVertical];
     [_mainStackView setSpacing:viewSpacing];
+    [_mainStackView setDistribution:UIStackViewDistributionEqualSpacing];
     
     
     [_stepOneStackView setSpacing:viewSpacing];
@@ -171,6 +216,7 @@
 {
     [self addSubview:_mainScrollView];
     [_mainScrollView addSubview:_mainStackView];
+    [_mainScrollView addSubview:_launchButton];
     
     [_mainStackView addArrangedSubview:_stepOneStackView];
     [_mainStackView addArrangedSubview:_previewImageView];
@@ -178,7 +224,6 @@
     [_mainStackView addArrangedSubview:_stepTwoStackView];
     
     [_mainStackView addArrangedSubview:_stepThreeLabel];
-    [_mainStackView addArrangedSubview:_launchButton];
     
     
     [_stepOneStackView addArrangedSubview:_stepOneLabel];
@@ -241,11 +286,11 @@
     [_previewImageView setImage:[[UIImage imageNamed:SMV_PREVIEW_IMG_RES] imageWithRenderingMode:UIImageRenderingModeAlwaysTemplate]];
     
     [_previewImageView setClipsToBounds:YES];
+    [_previewImageView setUserInteractionEnabled:YES];
     [_previewImageView setContentMode:UIViewContentModeScaleAspectFit];
     
     [_previewImageView setTintColor:[UIColor greenColor]];
     [_previewImageView setBackgroundColor:[UIColor darkGrayColor]];
-    
     
     [_previewImageView setTag:FHGTagSMVPreview];
 }
@@ -255,15 +300,14 @@
     UIImage *icon;
     UIColor *color;
     
-    BOOL    enabled;
-    BOOL    hidden;
+    const BOOL enabled = NO;
+          BOOL hidden;
     
     switch(tag) {
         case FHGTagSMVResetButton:
             icon    = [[UIImage imageNamed:SMV_RESTART_ICN_RES] imageWithRenderingMode:UIImageRenderingModeAlwaysTemplate];
-            color   = [UIColor blueColor];
+            color   = nil; //[UIColor blueColor];
             
-            enabled = NO;
             hidden  = YES;
             
             break;
@@ -272,7 +316,6 @@
             icon    = [[UIImage imageNamed:SMV_SETTINGS_ICN_RES] imageWithRenderingMode:UIImageRenderingModeAlwaysTemplate];
             color   = [UIColor redColor];
             
-            enabled = NO;
             hidden  = NO;
             
             break;
@@ -281,7 +324,6 @@
             icon    = [[UIImage imageNamed:SMV_LAUNCH_ICN_RES] imageWithRenderingMode:UIImageRenderingModeAlwaysTemplate];
             color   = [UIColor orangeColor];
             
-            enabled = NO;
             hidden  = NO;
             
             break;
@@ -290,7 +332,6 @@
             FHG_TAG_NOT_HANDLED;
     }
     
-    hidden = NO;
     [button setTag:tag];
     
     [button setHidden:hidden];
@@ -302,17 +343,10 @@
 
 - (void)configureRoiLayer
 {
-    const CGRect bounds  = [UIScreen mainScreen].bounds;
-    
-    const CGFloat roiX   = (CGRectGetWidth(bounds)  / 2.) - 25.;
-    const CGFloat roiY   = (CGRectGetHeight(bounds) / 2.) - 25.;
-    
     [_roiLayer setHidden:YES];
     [_roiLayer setBorderWidth:2.];
     [_roiLayer setDrawsAsynchronously:YES];
-    [_roiLayer setFrame:CGRectMake(roiX, roiY, 50., 50.)];
     [_roiLayer setBorderColor:[UIColor orangeColor].CGColor];
-    
 }
 
 #pragma mark - Specific Constraint methods
@@ -339,28 +373,23 @@
 - (void)setupMainStackViewConstraints
 {
     const CGFloat topSpacing    = FHGV_SCREEN_HEIGHT(kSMVTopSpacingPercentage);
-    const CGFloat bottomSpacing = FHGV_SCREEN_HEIGHT(kSMVBottomSpacingPercentage);
     const CGFloat rightSpacing  = FHGV_SCREEN_WIDTH(kSMVRightSpacingPercentage);
-    
     
     [_mainStackView setTranslatesAutoresizingMaskIntoConstraints:NO];
     
-    [[_mainStackView.leadingAnchor constraintEqualToAnchor:_mainScrollView.leadingAnchor] setActive:YES];
-    [[_mainStackView.trailingAnchor constraintEqualToAnchor:_mainScrollView.trailingAnchor constant:rightSpacing] setActive:YES];
-    [[_mainStackView.topAnchor constraintEqualToAnchor:_mainScrollView.topAnchor constant:topSpacing] setActive:YES];
-    [[_mainStackView.bottomAnchor constraintEqualToAnchor:_mainScrollView.bottomAnchor constant:-bottomSpacing] setActive:YES];
-    [[_mainStackView.widthAnchor constraintEqualToAnchor:_mainScrollView.widthAnchor constant:-rightSpacing] setActive:YES];
+    [[_mainStackView.leadingAnchor  constraintEqualToAnchor:_mainScrollView.leadingAnchor]                          setActive:YES];
+    [[_mainStackView.trailingAnchor constraintEqualToAnchor:_mainScrollView.trailingAnchor constant:rightSpacing]   setActive:YES];
+    [[_mainStackView.topAnchor      constraintEqualToAnchor:_mainScrollView.topAnchor constant:topSpacing]          setActive:YES];
+    
+    [[_mainStackView.widthAnchor    constraintEqualToAnchor:_mainScrollView.widthAnchor constant:-rightSpacing]     setActive:YES];
 }
 
 - (void)setupSmallStackViewsConstraints
-{
-    const CGFloat rightSpacing  =  FHGV_SCREEN_WIDTH(kEPVRightSpacingPercentage);
-    
-    [_stepOneStackView setTranslatesAutoresizingMaskIntoConstraints:NO];
-    [[_stepOneStackView.widthAnchor constraintEqualToAnchor:_mainScrollView.widthAnchor constant:-rightSpacing] setActive:YES];
+{[_stepOneStackView setTranslatesAutoresizingMaskIntoConstraints:NO];
+    [[_stepOneStackView.widthAnchor constraintEqualToAnchor:_mainStackView.widthAnchor] setActive:YES];
     
     [_stepTwoStackView setTranslatesAutoresizingMaskIntoConstraints:NO];
-    [[_stepTwoStackView.widthAnchor constraintEqualToAnchor:_mainScrollView.widthAnchor constant:-rightSpacing] setActive:YES];
+    [[_stepTwoStackView.widthAnchor constraintEqualToAnchor:_mainStackView.widthAnchor] setActive:YES];
 }
 
 - (void)setupPreviewConstraints
@@ -385,6 +414,7 @@
     [_settingsButton setTranslatesAutoresizingMaskIntoConstraints:NO];
     [_launchButton   setTranslatesAutoresizingMaskIntoConstraints:NO];
     
+    [[_reselectButton.heightAnchor constraintEqualToAnchor:_stepOneStackView.heightAnchor] setActive:YES];
 //    [_reselectButton addConstraint:[NSLayoutConstraint
 //                                      constraintWithItem:_reselectButton
 //                                      attribute:NSLayoutAttributeHeight
@@ -392,7 +422,8 @@
 //                                      toItem:_reselectButton
 //                                      attribute:NSLayoutAttributeWidth
 //                                      multiplier:1.
-//                                      constant:1.]];
+//                                      constant:0.]];
+    
     [_settingsButton addConstraint:[NSLayoutConstraint
                                     constraintWithItem:_settingsButton
                                     attribute:NSLayoutAttributeHeight
@@ -400,55 +431,27 @@
                                     toItem:_settingsButton
                                     attribute:NSLayoutAttributeWidth
                                     multiplier:1.
-                                    constant:1.]];
+                                    constant:0.]];
+    
+    
+
+    const CGFloat topSpacing = FHGV_SCREEN_WIDTH(kSMVViewSpacingPercentage);
+    const CGFloat sideSpacing  = FHGV_SCREEN_WIDTH(kSMVCn2SpacingPercentage);
+    const CGFloat bottomSpacing = FHGV_SCREEN_HEIGHT(kSMVBottomSpacingPercentage);
+    
+    [[_launchButton.leftAnchor  constraintEqualToAnchor:_mainScrollView.leftAnchor    constant:+sideSpacing]  setActive:YES];
+    [[_launchButton.topAnchor   constraintEqualToAnchor:_mainStackView.bottomAnchor   constant:topSpacing]    setActive:YES];
+    [[_launchButton.rightAnchor constraintEqualToAnchor:_mainScrollView.rightAnchor   constant:-sideSpacing]  setActive:YES];
+    [[_launchButton.bottomAnchor constraintEqualToAnchor:_mainScrollView.bottomAnchor constant:bottomSpacing] setActive:YES];
     
     [_launchButton addConstraint:[NSLayoutConstraint
-                                    constraintWithItem:_launchButton
-                                    attribute:NSLayoutAttributeHeight
-                                    relatedBy:NSLayoutRelationEqual
-                                    toItem:_launchButton
-                                    attribute:NSLayoutAttributeWidth
-                                    multiplier:1.
-                                    constant:1.]];
-
-    
-    const CGFloat Cn2Spacing = FHGV_SCREEN_WIDTH(kSMVCn2SpacingPercentage);
-    
-    [self addConstraint:[NSLayoutConstraint
                                   constraintWithItem:_launchButton
-                                  attribute:NSLayoutAttributeLeft
+                                  attribute:NSLayoutAttributeHeight
                                   relatedBy:NSLayoutRelationEqual
-                                  toItem:_mainStackView
-                                  attribute:NSLayoutAttributeLeft
+                                  toItem:_launchButton
+                                  attribute:NSLayoutAttributeWidth
                                   multiplier:1.
-                                  constant:Cn2Spacing]];
-    [self addConstraint:[NSLayoutConstraint
-                         constraintWithItem:_launchButton
-                         attribute:NSLayoutAttributeRight
-                         relatedBy:NSLayoutRelationEqual
-                         toItem:_mainStackView
-                         attribute:NSLayoutAttributeRight
-                         multiplier:1.
-                         constant:-Cn2Spacing]];
-//    [_launchButton.widthAnchor constraintEqualToAnchor:_mainStackView.widthAnchor constant:-200.];
-//    [self addConstraint:[NSLayoutConstraint
-//                          constraintWithItem:_launchButton
-//                          attribute:NSLayoutAttributeWidth
-//                          relatedBy:NSLayoutRelationEqual
-//                          toItem:_mainStackView
-//                          attribute:NSLayoutAttributeWidth
-//                          multiplier:0.5
-//                          constant:1.]];
-//    [self addConstraint:[NSLayoutConstraint
-//                         constraintWithItem:_launchButton
-//                         attribute:NSLayoutAttributeLeft
-//                         relatedBy:NSLayoutRelationEqual
-//                         toItem:_mainStackView
-//                         attribute:NSLayoutAttributeLeft
-//                         multiplier:1.
-//                         constant:30.]];
-    
-    
+                                  constant:0.]];
 }
 
 /*
