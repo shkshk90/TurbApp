@@ -32,6 +32,7 @@
 @private UILabel        *_stepThreeLabel;
 @private UIButton       *_launchButton;
     
+@private UIStackView    *_debugStackView;
 
     
 }
@@ -95,8 +96,9 @@
     }
     
     switch ((FHGTagStorageMeasurementViewsTags)tag) {
-        case FHGTagSMVPreview: return _previewImageView;
-        default:               break;
+        case FHGTagSMVPreview:       return _previewImageView;
+        case FHGTagSMVDebugStackView: return _debugStackView;
+        default:                     break;
     }
     
     FHG_TAG_NOT_HANDLED;
@@ -155,6 +157,8 @@
     _stepThreeLabel         = [[UILabel     alloc] init];
     _launchButton           =  [UIButton    buttonWithType:UIButtonTypeSystem];
     
+    _debugStackView       = [[UIStackView alloc] init];
+    
     
     
     
@@ -172,6 +176,8 @@
     
     [_stepThreeLabel        setOpaque:YES];
     [_launchButton          setOpaque:YES];
+    
+    [_debugStackView        setOpaque:YES];
 }
 
 #pragma mark - General Setup methods
@@ -199,6 +205,10 @@
     [_launchButton setContentVerticalAlignment:UIControlContentVerticalAlignmentFill];
     [_launchButton setContentHorizontalAlignment:UIControlContentHorizontalAlignmentFill];
     
+    [_debugStackView setAxis:UILayoutConstraintAxisVertical];
+    [_debugStackView setSpacing:0.];
+    [_debugStackView setDistribution:UIStackViewDistributionFillProportionally];
+    
     
     [self configureLabel:_stepOneLabel   withTag:FHGTagSMVStepOne];
     [self configureLabel:_stepTwoLabel   withTag:FHGTagSMVStepTwo];
@@ -222,6 +232,7 @@
     [_mainStackView addArrangedSubview:_previewImageView];
     
     [_mainStackView addArrangedSubview:_stepTwoStackView];
+    [_mainStackView addArrangedSubview:_debugStackView];
     
     [_mainStackView addArrangedSubview:_stepThreeLabel];
     
@@ -443,6 +454,7 @@
     [[_launchButton.topAnchor   constraintEqualToAnchor:_mainStackView.bottomAnchor   constant:topSpacing]    setActive:YES];
     [[_launchButton.rightAnchor constraintEqualToAnchor:_mainScrollView.rightAnchor   constant:-sideSpacing]  setActive:YES];
     [[_launchButton.bottomAnchor constraintEqualToAnchor:_mainScrollView.bottomAnchor constant:bottomSpacing] setActive:YES];
+//    [[_launchButton.bottomAnchor constraintEqualToAnchor:_debugStackView.topAnchor constant:bottomSpacing] setActive:YES];
     
     [_launchButton addConstraint:[NSLayoutConstraint
                                   constraintWithItem:_launchButton
@@ -452,6 +464,12 @@
                                   attribute:NSLayoutAttributeWidth
                                   multiplier:1.
                                   constant:0.]];
+    
+//    [[_debugStackView.leftAnchor  constraintEqualToAnchor:_mainScrollView.leftAnchor]  setActive:YES];
+//    [[_debugStackView.rightAnchor constraintEqualToAnchor:_mainScrollView.rightAnchor]  setActive:YES];
+//
+////    [[_debugStackView.topAnchor   constraintEqualToAnchor:_mainStackView.bottomAnchor   constant:topSpacing]    setActive:YES];
+//    [[_debugStackView.bottomAnchor constraintEqualToAnchor:_mainScrollView.topAnchor constant:bottomSpacing] setActive:YES];
 }
 
 /*

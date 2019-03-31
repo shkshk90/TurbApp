@@ -24,11 +24,12 @@ typedef NS_ENUM(NSInteger, FHGTagExperimentParametersTextField) {
 typedef NS_ENUM(NSInteger, FHGTagExperimentParametersSegmentedControl) {
     FHGTagEPVSegControlLength    = 6,
     FHGTagEPVSegControlBlockSize = 7,
+    FHGTagEPVSegControlUpscale   = 8,
 };
 
 typedef NS_ENUM(NSInteger, FHGTagExperimentParametersLengthOfScene) {
-    FHGTagEPVSceneWidth          = 8,
-    FHGTagEPVSceneHeight         = 9,
+    FHGTagEPVSceneWidth          = 9,
+    FHGTagEPVSceneHeight         = 10,
 };
 
 #endif /* ExperimentParameters_common_h */

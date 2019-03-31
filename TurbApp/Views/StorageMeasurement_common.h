@@ -23,6 +23,7 @@ typedef NS_ENUM(NSInteger, FHGTagStorageMeasurementButtonTags) {
 
 typedef NS_ENUM(NSInteger, FHGTagStorageMeasurementViewsTags) {
     FHGTagSMVPreview        = 7,
+    FHGTagSMVDebugStackView  = 8,
 };
 
 #endif /* StorageMeasurement_common_h */

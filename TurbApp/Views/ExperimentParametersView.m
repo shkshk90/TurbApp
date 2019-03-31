@@ -40,33 +40,14 @@
 @private UILabel                        *_samplesCount;
 @private UISlider                       *_samplesSlider;
     
+@private UILabel                        *_upScaleLabel;
+@private UISegmentedControl             *_upScaleSegmentedControl;
+    
 @private UIImage                        *_widthImage;
 @private UIImage                        *_heightImage;
 }
 
 #pragma mark - Protocol methods
-- (id)initWithContentView:(UIView *const)superView
-{
-    self = [super init] ?: nil;
-    
-    if (self == nil)
-        return nil;
-    
-    _guide  = superView.safeAreaLayoutGuide;
-    
-    [self initAllViews];
-    [self initVariables];
-    
-    [superView addSubview:self];
-    
-    
-    [self setupViews];
-    [self buildMainView];
-    [self setupAllConstraints];
-    
-    return self;
-}
-
 - (id)init
 {
     self = [super init];
@@ -93,6 +74,7 @@
     switch ((FHGTagExperimentParametersViews)tag) {
         case FHGTagEPVViewMainScrollView: return _mainScrollView;
         case FHGTagEPVViewSamplesSlider:  return _samplesSlider;
+        default: break;
     }
     
     switch ((FHGTagExperimentParametersTextField)tag) {
@@ -100,11 +82,14 @@
         case FHGTagEPVTextFieldAperture:     return _apertureTextField;
         case FHGTagEPVTextFieldLength:       return _lengthTextField;
         case FHGTagEPVTextFieldSamplesCount: return _samplesCount;
+        default: break;
     }
     
     switch ((FHGTagExperimentParametersSegmentedControl)tag) {
         case FHGTagEPVSegControlLength:     return _lengthSegmentedControl;
         case FHGTagEPVSegControlBlockSize:  return _blockSegmentedControl;
+        case FHGTagEPVSegControlUpscale:    return _upScaleSegmentedControl;
+        default: break;
     }
 
     FHG_TAG_NOT_HANDLED;
@@ -112,8 +97,9 @@
 
 - (void)setButtonsTarget:(UIViewController *const)target withSelector:(const SEL)selector
 {
-    [_blockSegmentedControl  addTarget:target action:selector forControlEvents:UIControlEventValueChanged];
-    [_lengthSegmentedControl addTarget:target action:selector forControlEvents:UIControlEventValueChanged];
+    [_blockSegmentedControl    addTarget:target action:selector forControlEvents:UIControlEventValueChanged];
+    [_lengthSegmentedControl   addTarget:target action:selector forControlEvents:UIControlEventValueChanged];
+    [_upScaleSegmentedControl addTarget:target action:selector forControlEvents:UIControlEventValueChanged];
 }
 
 - (void)setTextFieldDelegateAndTarget:(UIViewController<UITextFieldDelegate> *const)target withSelector:(const SEL)selector
@@ -174,7 +160,7 @@
     }
 }
 
-- (void)updateSegmentedControl:(const NSInteger)tag withValue:(const NSInteger)value
+- (void)updateSegmentedControl:(const NSInteger)tag withValue:(const NSUInteger)value
 {
     switch ((FHGTagExperimentParametersSegmentedControl)tag) {
         case FHGTagEPVSegControlLength:
@@ -185,6 +171,11 @@
         case FHGTagEPVSegControlBlockSize:
             [_blockSegmentedControl setSelectedSegmentIndex:fhgv_indexForBlockSize(value)];
             [_blockSegmentedControl sendActionsForControlEvents:UIControlEventValueChanged];
+            break;
+            
+        case FHGTagEPVSegControlUpscale:
+            [_upScaleSegmentedControl setSelectedSegmentIndex:value == 8 ? 3 : (value >> 1)];
+            [_upScaleSegmentedControl sendActionsForControlEvents:UIControlEventValueChanged];
             break;
             
         default:
@@ -206,54 +197,60 @@
 
 - (void)initAllViews
 {
-    _mainScrollView         = [[UIScrollView alloc] init];
-    _mainStackView          = [[UIStackView  alloc] init];
+    _mainScrollView             = [[UIScrollView alloc] init];
+    _mainStackView              = [[UIStackView  alloc] init];
     
-    _distanceLabel          = [[UILabel      alloc] init];
-    _distanceTextField      = [[UITextField  alloc] init];
+    _distanceLabel              = [[UILabel      alloc] init];
+    _distanceTextField          = [[UITextField  alloc] init];
     
-    _apertureLabel          = [[UILabel      alloc] init];
-    _apertureTextField      = [[UITextField  alloc] init];
+    _apertureLabel              = [[UILabel      alloc] init];
+    _apertureTextField          = [[UITextField  alloc] init];
     
-    _lengthLabel            = [[UILabel     alloc] init];;
-    _lengthSegmentedControl = [[UISegmentedControl alloc] init];
-    _lengthStackView        = [[UIStackView alloc] init];
-    _lengthTextField        = [[UITextField alloc] init];
-    _lengthImageView        = [[UIImageView alloc] init];
+    _lengthLabel                = [[UILabel     alloc] init];
+    _lengthSegmentedControl     = [[UISegmentedControl alloc] init];
+    _lengthStackView            = [[UIStackView alloc] init];
+    _lengthTextField            = [[UITextField alloc] init];
+    _lengthImageView            = [[UIImageView alloc] init];
     
-    _blockLabel             = [[UILabel            alloc] init];;
-    _blockSegmentedControl  = [[UISegmentedControl alloc] init];
+    _blockLabel                 = [[UILabel            alloc] init];
+    _blockSegmentedControl      = [[UISegmentedControl alloc] init];
     
-    _samplesLabelStackView  = [[UIStackView alloc] init];
-    _samplesLabel           = [[UILabel     alloc] init];
-    _samplesCount           = [[UILabel     alloc] init];
+    _samplesLabelStackView      = [[UIStackView alloc] init];
+    _samplesLabel               = [[UILabel     alloc] init];
+    _samplesCount               = [[UILabel     alloc] init];
     
-    _samplesSlider          = [[UISlider    alloc] init];
+    _samplesSlider              = [[UISlider    alloc] init];
+    
+    _upScaleLabel         = [[UILabel            alloc] init];
+    _upScaleSegmentedControl   = [[UISegmentedControl alloc] init];
     
     
-    [_mainScrollView setOpaque:YES];
-    [_mainStackView  setOpaque:YES];
+    [_mainScrollView            setOpaque:YES];
+    [_mainStackView             setOpaque:YES];
     
-    [_distanceLabel     setOpaque:YES];
-    [_distanceTextField setOpaque:YES];
+    [_distanceLabel             setOpaque:YES];
+    [_distanceTextField         setOpaque:YES];
     
-    [_apertureLabel     setOpaque:YES];
-    [_apertureTextField setOpaque:YES];
+    [_apertureLabel             setOpaque:YES];
+    [_apertureTextField         setOpaque:YES];
     
-    [_lengthLabel           setOpaque:YES];
-    [_lengthSegmentedControl setOpaque:YES];
-    [_lengthStackView       setOpaque:YES];
-    [_lengthTextField       setOpaque:YES];
-    [_lengthImageView       setOpaque:YES];
+    [_lengthLabel               setOpaque:YES];
+    [_lengthSegmentedControl    setOpaque:YES];
+    [_lengthStackView           setOpaque:YES];
+    [_lengthTextField           setOpaque:YES];
+    [_lengthImageView           setOpaque:YES];
      
-    [_blockLabel            setOpaque:YES];
-    [_blockSegmentedControl setOpaque:YES];
+    [_blockLabel                setOpaque:YES];
+    [_blockSegmentedControl     setOpaque:YES];
     
-    [_samplesLabelStackView setOpaque:YES];
-    [_samplesLabel          setOpaque:YES];
-    [_samplesCount          setOpaque:YES];
+    [_samplesLabelStackView     setOpaque:YES];
+    [_samplesLabel              setOpaque:YES];
+    [_samplesCount              setOpaque:YES];
     
-    [_samplesSlider          setOpaque:YES];
+    [_samplesSlider             setOpaque:YES];
+    
+    [_upScaleLabel        setOpaque:YES];
+    [_upScaleSegmentedControl  setOpaque:YES];
 }
 
 #pragma mark - General Setup methods
@@ -277,18 +274,20 @@
     
     
     
-    [self configureLabel:_distanceLabel withTag:FHGTagEPVTextFieldDistance];
-    [self configureLabel:_apertureLabel withTag:FHGTagEPVTextFieldAperture];
-    [self configureLabel:_lengthLabel   withTag:FHGTagEPVTextFieldLength];
-    [self configureLabel:_blockLabel    withTag:FHGTagEPVSegControlBlockSize];
-    [self configureLabel:_samplesLabel withTag:FHGTagEPVTextFieldSamplesCount];
+    [self configureLabel:_distanceLabel      withTag:FHGTagEPVTextFieldDistance];
+    [self configureLabel:_apertureLabel      withTag:FHGTagEPVTextFieldAperture];
+    [self configureLabel:_lengthLabel        withTag:FHGTagEPVTextFieldLength];
+    [self configureLabel:_blockLabel         withTag:FHGTagEPVSegControlBlockSize];
+    [self configureLabel:_samplesLabel       withTag:FHGTagEPVTextFieldSamplesCount];
+    [self configureLabel:_upScaleLabel withTag:FHGTagEPVSegControlUpscale];
     
     [self configureTextField:_distanceTextField withTag:FHGTagEPVTextFieldDistance];
     [self configureTextField:_apertureTextField withTag:FHGTagEPVTextFieldAperture];
     [self configureTextField:_lengthTextField   withTag:FHGTagEPVTextFieldLength];
     
-    [self configureSegmentedControl:_lengthSegmentedControl withTag:FHGTagEPVSegControlLength];
-    [self configureSegmentedControl:_blockSegmentedControl  withTag:FHGTagEPVSegControlBlockSize];
+    [self configureSegmentedControl:_lengthSegmentedControl     withTag:FHGTagEPVSegControlLength];
+    [self configureSegmentedControl:_blockSegmentedControl      withTag:FHGTagEPVSegControlBlockSize];
+    [self configureSegmentedControl:_upScaleSegmentedControl   withTag:FHGTagEPVSegControlUpscale];
     
     [self configureSliderWithTag:FHGTagEPVViewSamplesSlider];
 }
@@ -310,6 +309,9 @@
     
     [_mainStackView addArrangedSubview:_blockLabel];
     [_mainStackView addArrangedSubview:_blockSegmentedControl];
+    
+    [_mainStackView addArrangedSubview:_upScaleLabel];
+    [_mainStackView addArrangedSubview:_upScaleSegmentedControl];
     
     [_mainStackView addArrangedSubview:_samplesLabelStackView];
     [_mainStackView addArrangedSubview:_samplesSlider];
@@ -361,6 +363,10 @@
             
         case FHGTagEPVSegControlLength:
             return;
+            
+        case FHGTagEPVSegControlUpscale:
+            labelText = EPV_LABEL_SBUS_RES;
+            break;
             
         default:
             FHG_TAG_NOT_HANDLED;
@@ -424,6 +430,11 @@
         case FHGTagEPVSegControlBlockSize:
             segments = EPV_SEGCL_BS_ARR_RES;
             defaultSelection = 1;
+            break;
+            
+        case FHGTagEPVSegControlUpscale:
+            segments = EPV_SEGCL_SP_ARR_RES;
+            defaultSelection = 2;
             break;
         
         default:

@@ -15,6 +15,8 @@ NS_ASSUME_NONNULL_BEGIN
 @property (strong,   nonatomic) NSDictionary  *experimentDataDict;
 @property (readonly, nonatomic) CGSize         videoSize;
 
+- (UIView *)debugView;
+
 @end
 
 NS_ASSUME_NONNULL_END

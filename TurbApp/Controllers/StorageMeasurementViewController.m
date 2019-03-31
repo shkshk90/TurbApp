@@ -16,9 +16,10 @@
 #import "../Views/StorageMeasurement_common.h"
 #import "../common.h"
 #import "UIViewController+UIViewController_FHGViewAddition.h"
+#import "../Models/AbsoluteCorrelatorX.h"
 
 #pragma mark - Interface
-@interface FHGStorageMeasurementViewController () <FHGMediaPickerControllerDelegate, FHGProtocolExperimentParametersDelegate>
+@interface FHGStorageMeasurementViewController () <FHGMediaPickerControllerDelegate, FHGProtocolExperimentParametersDelegate, FHGProtocolDebuggableControllerDelegate>
 
 @end
 
@@ -27,6 +28,8 @@
     
 @private FHGStorageMeasurementView  *_contentView;
 @private FHGRoiGestureHandler       *_gesturesHandler;
+    
+@private FHGAbsoluteCorrelatorX      *_absoluteImgMotionCorrelator;
     
 @private UITapGestureRecognizer     *_stepTwoTapGesture;
 @private AVURLAsset                 *_videoURL;
@@ -43,6 +46,10 @@
     [super viewDidLoad];
     // Do any additional setup after loading the view.
     [self configureNavigation];
+    
+    _absoluteImgMotionCorrelator = [[FHGAbsoluteCorrelatorX alloc] init];
+    [_absoluteImgMotionCorrelator setDelegate:self];
+    
     
     _contentView = [[FHGStorageMeasurementView alloc] init];
     [self fhg_addMainSubView:_contentView];
@@ -62,6 +69,11 @@
     _dispatchGroup = dispatch_group_create();
 }
 
+- (UIView *)debugView
+{
+    return [_contentView viewWithTag:FHGTagSMVDebugStackView];
+}
+
 #pragma mark - Navigatian methods
 - (void)configureNavigation
 {
@@ -75,7 +87,7 @@
                                         initWithImage:[[FHGStorageMeasurementView goBackImage] imageWithRenderingMode:UIImageRenderingModeAlwaysTemplate]
                                                 style:UIBarButtonItemStylePlain
                                                target:self
-                                               action:@selector(cancel)];
+                                               action:@selector(goBack)];
 
     
     const CGFloat imageSideInset = CGRectGetWidth( [UIScreen mainScreen].bounds) * 0.0625;
@@ -84,8 +96,9 @@
     [self.navigationItem.leftBarButtonItem setImageInsets:UIEdgeInsetsMake(0., -imageSideInset, 0., imageSideInset)];
 }
 
-- (IBAction)cancel
+- (IBAction)goBack
 {
+    [_absoluteImgMotionCorrelator freeMemory];
     [self dismissViewControllerAnimated:YES completion:nil];
 }
 
@@ -128,6 +141,10 @@
             return;
             
         case FHGTagSMVLaunchButton :
+            [_absoluteImgMotionCorrelator setRoiFrame:fhgc_calculateFinalRoi([_contentView viewWithTag:FHGTagSMVPreview].frame.size,
+                                                                             _videoSize, [_contentView roiLayer].frame)];
+            [_absoluteImgMotionCorrelator play];
+            
             NSLog(@"Launch");
             break;
             
@@ -245,8 +262,10 @@
     if (firstFrame == nil)
         return;
     
+    
     _videoURL  = selectedVideoURL;
     _videoSize = [self getVideoSizeFromAsset:selectedVideoURL];
+    [_absoluteImgMotionCorrelator setVideoUrl:_videoURL];
     
     UIImageView *const previewImageView = (UIImageView *)[_contentView viewWithTag:FHGTagSMVPreview];
     
@@ -304,6 +323,9 @@
     
     [settingsButton setTintColor:[UIColor greenColor]];
     [launchButton setEnabled:YES];
+    
+    
+    [_absoluteImgMotionCorrelator setExperimentData:_experimentDataDict];
 }
 
 #pragma mark - Experiment Data Dictionary methods

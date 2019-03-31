@@ -35,8 +35,8 @@
 @private CGFloat                        _lengthInMeters;
 @private CGFloat                        _samplesCountOverTen;
 
-@private NSInteger                      _blockInPixels;
-
+@private NSUInteger                     _blockInPixels;
+@private NSUInteger                     _upScale;
 
 }
 
@@ -62,6 +62,7 @@
     _samplesCountOverTen    = 3.;
     
     _blockInPixels          = 32;
+    _upScale                = 4;
     
     _contentView = [[FHGExperimentParametersView alloc] init];
     [self fhg_addMainSubView:_contentView];
@@ -102,6 +103,7 @@
     
     [_contentView updateSegmentedControl:FHGTagEPVSegControlLength    withValue:_lengthIsHeight];
     [_contentView updateSegmentedControl:FHGTagEPVSegControlBlockSize withValue:_blockInPixels];
+    [_contentView updateSegmentedControl:FHGTagEPVSegControlUpscale   withValue:_upScale];
     
     
     [self.navigationItem.rightBarButtonItem setEnabled:YES];
@@ -133,14 +135,19 @@
     NSNumber *const blockValue    = (NSNumber *)[dict objectForKey:FHGK_EXP_PARAM_BLOCK_SIZE];
     NSNumber *const samplesValue  = (NSNumber *)[dict objectForKey:FHGK_EXP_PARAM_NUMBER_OF_SAMPLES];
     
+    NSNumber *const upscaleValue  = (NSNumber *)[dict objectForKey:FHGK_EXP_PARAM_SUBPIXEL_UPSCALE];
+    
     
     _distanceInMeters       = (CGFloat)[distanceValue doubleValue];
     _apertureInMillimeters  = (CGFloat)[apertureValue doubleValue];
     _lengthInMeters         = (CGFloat)[lengthValue   doubleValue];
     
     _lengthIsHeight         = fabs([pixelsValue  doubleValue] - _delegate.videoSize.height) < DBL_EPSILON ;
-    _blockInPixels          = [blockValue   integerValue];
-    _samplesCountOverTen    = [samplesValue doubleValue];
+    _blockInPixels          = [blockValue        unsignedIntegerValue];
+    _samplesCountOverTen    = [samplesValue      doubleValue];
+    _upScale                = [upscaleValue      unsignedIntegerValue];
+    
+    FHG_NS_LOG(@"Data retrieved: %@", dict);
     
     return YES;
 }
@@ -163,9 +170,13 @@
        FHGK_EXP_PARAM_PIXELS_IN_SCENE    : [NSNumber numberWithDouble:(_lengthIsHeight) ? _delegate.videoSize.height : _delegate.videoSize.width],
        FHGK_EXP_PARAM_LENGTH_OF_SCENE    : [NSNumber numberWithDouble:_lengthInMeters],
        
-       FHGK_EXP_PARAM_BLOCK_SIZE         : [NSNumber numberWithInteger:_blockInPixels],
+       FHGK_EXP_PARAM_BLOCK_SIZE         : [NSNumber numberWithUnsignedInteger:_blockInPixels],
        FHGK_EXP_PARAM_NUMBER_OF_SAMPLES  : [NSNumber numberWithDouble:_samplesCountOverTen],
+       
+       FHGK_EXP_PARAM_SUBPIXEL_UPSCALE   : [NSNumber numberWithUnsignedInteger:_upScale],
     };
+    
+    FHG_NS_LOG(@"Data Saved: %@", dictionary);
     
     return dictionary;
 }
@@ -209,6 +220,7 @@
 {
     return;
 }
+
 - (void)checkTextField:(UITextField *)field
 {
     const CGFloat fieldValue = (CGFloat)[field.text doubleValue];
@@ -253,8 +265,16 @@
             
         case FHGTagEPVSegControlBlockSize :
             
-            _blockInPixels = 1 << (4 + index);
+            _blockInPixels = 1 << (4 + (NSUInteger)index);
             break;
+            
+        case FHGTagEPVSegControlUpscale:
+            
+            _upScale       = 1 << (NSUInteger)index;
+            break;
+            
+        default:
+            FHG_TAG_NOT_HANDLED;
     }
 }
 

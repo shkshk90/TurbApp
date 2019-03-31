@@ -64,15 +64,17 @@ static const CGFloat kEPVStartingSamplesCount    = 30.;
 #define EPV_LABEL_LENG_RES    @"Length of scene [m]:"
 #define EPV_LABEL_BLKS_RES    @"Single block size [px]:"
 #define EBV_LABEL_SMPL_RES    @"Number of Frames:"
+#define EPV_LABEL_SBUS_RES    @"Subpixel Scale:"
 
-#define EPV_PHLDR_WDTH_RES   @"Enter scene width in meters."
-#define EPV_PHLDR_HOCH_RES   @"Enter scene height in meters."
+#define EPV_PHLDR_WDTH_RES    @"Enter scene width in meters."
+#define EPV_PHLDR_HOCH_RES    @"Enter scene height in meters."
 
 #define EPV_PHLDR_DIST_RES    @"Enter Distance in meters."
 #define EPV_PHLDR_APRT_RES    @"Enter aperture size in millimeters."
 #define EPV_PHLDR_BLKS_RES    @""
 
 #define EPV_SEGCL_BS_ARR_RES  @[ @"16", @"32", @"64", @"128" ]
+#define EPV_SEGCL_SP_ARR_RES  @[ @"1",  @"2",  @"4",  @"8"]
 
 /*********************************************************************/
 
@@ -132,7 +134,7 @@ fhgv_getPercentageOfScreenWidth(const CGRect screenBounds, const CGFloat percent
 }
 
 NS_INLINE NSInteger
-fhgv_indexForBlockSize(const NSInteger size)
+fhgv_indexForBlockSize(const NSUInteger size)
 {
     NSInteger result = 0;
     
