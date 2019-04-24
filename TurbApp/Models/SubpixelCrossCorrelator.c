@@ -48,8 +48,8 @@ static inline void inverse_fft2D_shift(const DSPSplitComplex *const restrict inp
 
 void
 fhgm_spxc_create_kernels(float *const restrict kernel_1,
-                  float *const restrict kernel_2,
-                  const size_t block_size)
+                         float *const restrict kernel_2,
+                         const size_t block_size)
 {
     const float side_length = (float)block_size;
     
@@ -135,12 +135,16 @@ fhgm_spxc_create_upscaled_complex_kernel(const DSPSplitComplex *const restrict u
     vDSP_vclr(up_scaled_kernel->imagp, 1, upscale_opf);         // Zero the complex part
 }
 
+
+
+
+
 CGPoint
 fhgm_spxc_correlate_two_blocks_no_scale(const DSPSplitComplex *const restrict ref_block,
-                                 const DSPSplitComplex *const restrict smp_block,
-                                 const DSPSplitComplex *const restrict spo_block,
-                                 const float *const restrict side_kernel,
-                                 const size_t log_two_of_blockSize)
+                                        const DSPSplitComplex *const restrict smp_block,
+                                        const DSPSplitComplex *const restrict spo_block,
+                                        const float           *const restrict side_kernel,
+                                        const size_t log_two_of_blockSize)
 {
     const vDSP_Length block_size_squared = (vDSP_Length)(calculate_block_size_squared(log_two_of_blockSize));
     
@@ -154,7 +158,7 @@ fhgm_spxc_correlate_two_blocks_no_scale(const DSPSplitComplex *const restrict re
                -1);
     
     // Use temp buffer after the current block
-    float *const magnitudes_arr = (float *)(spo_block->realp + sizeof(float) * block_size_squared);
+    float *const magnitudes_arr = spo_block->imagp + block_size_squared + 4;
     
     vDSP_vdist(spo_block->realp, 1, spo_block->imagp, 1, magnitudes_arr, 1, block_size_squared);
     

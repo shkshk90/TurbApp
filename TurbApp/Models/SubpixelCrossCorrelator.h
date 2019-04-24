@@ -36,10 +36,10 @@ fhgm_spxc_create_complex_kernel(const DSPSplitComplex *const restrict n_kernel,
 // The input are the reference and the sample block AFTER FFT (VIP)
 CGPoint
 fhgm_spxc_correlate_two_blocks_no_scale(const DSPSplitComplex *const restrict ref_block,
-                                 const DSPSplitComplex *const restrict smp_block,
-                                 const DSPSplitComplex *const restrict tmp_block,   // Spectrum output, TEMP buffer in other words
-                                 const float *const restrict side_kernel,
-                                 const size_t log_two_of_blockSize);
+                                        const DSPSplitComplex *const restrict smp_block,
+                                        const DSPSplitComplex *const restrict tmp_block,   // Spectrum output, TEMP buffer in other words
+                                        const float *const restrict side_kernel,
+                                        const size_t log_two_of_blockSize);
 /*
  *      tmp_block has 2 pointers, each allocated with  13 * blockSizeSquared
  *      5 = 1 (1 normal block) + 3 * (4 * blockSizeSquared == 2*blockSize * 2*blockSize)

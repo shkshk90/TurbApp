@@ -53,4 +53,22 @@ create_raw_blocks_from_cg_image(const CGImageRef full_image,
     fhgm_ipp_cut_image_into_raw_blocks_F(&croppedBufferROI_F, blocks_buffer, block_side, block_count_per_roi_side);
 }
 
+NS_INLINE void *
+fhg_corr_malloc(const size_t size)
+{
+    void *const ptr = malloc(size);
+    NSCAssert1(ptr != NULL, @"Error: pointer of size %lu is NULL\n", size);
+    
+    return ptr;
+}
+
+NS_INLINE void *
+fhg_corr_calloc(const size_t count, const size_t size)
+{
+    void *const ptr = calloc(count, size);
+    NSCAssert1(ptr != NULL, @"Error: pointer of size %lu is NULL\n", size);
+    
+    return ptr;
+}
+
 #endif /* AbsoluteCorrelator_private_h */

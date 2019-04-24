@@ -9,11 +9,48 @@
 #ifndef ModelsResources_h
 #define ModelsResources_h
 
-#import <Foundation/Foundation.h>
+//#import <Foundation/Foundation.h>
+
+typedef unsigned long NSUInteger;
 
 #define CONCURRENT_QUEUE_LABEL "io.sam.absolute-correlator-concurrent-queue"
 #define SERIAL_QUEUE_LABEL     "io.sam.absolute-correlator-serial-queue"
 
+#define FHG_FREE(PTR) do {  \
+    if (PTR) {              \
+        free(PTR);          \
+        PTR = NULL;         \
+    }                       \
+} while(NO)
+
+
+// ALL THE RELEVANT DIMENSIONS
+struct FhgDimensions {
+    uint32_t width;
+    uint32_t height;
+    
+    uint32_t area;
+    
+    size_t offsetCount;
+    size_t offsetBytes;
+};
+
+// ALL THE RELEVANT DIMENSIONS
+struct FhgData {
+    uint32_t numberOfFrames;
+    
+    uint32_t blocksPerRoi;
+    uint32_t blocksPerWidthRoi;
+    
+    uint32_t roiOriginPointX;
+    uint32_t roiOriginPointY;
+    
+    size_t fullFrameRowBytes;
+    
+    struct FhgDimensions block;
+    struct FhgDimensions roi;
+    struct FhgDimensions fullFrame;
+};
 
 
 // EVERYTHING IS IN BYTES
@@ -47,7 +84,7 @@ static const NSUInteger kAIMMaxROISide        = 640;   // Max Allowed Height
 
 
 
-NS_INLINE NSUInteger
+static inline NSUInteger
 fhgm_log_two(const NSUInteger length)
 {
     const uint32_t length32      = (uint32_t)length;
