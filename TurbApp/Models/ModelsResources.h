@@ -45,6 +45,9 @@ struct FhgData {
     uint32_t roiOriginPointX;
     uint32_t roiOriginPointY;
     
+    uint32_t fftSetupLength;
+    uint32_t fft2DLength;
+    
     size_t fullFrameRowBytes;
     
     struct FhgDimensions block;
@@ -91,6 +94,15 @@ fhgm_log_two(const NSUInteger length)
     const uint32_t leadingZeroes = __builtin_clz(length32);
     
     const NSUInteger log2len    = (NSUInteger)(31 - leadingZeroes);
+    
+    return log2len;
+}
+
+static inline uint32_t
+fhgm_log2n(const uint32_t length)
+{
+    const uint32_t leadingZeroes = __builtin_clz(length);
+    const uint32_t log2len       = 31 - leadingZeroes;
     
     return log2len;
 }

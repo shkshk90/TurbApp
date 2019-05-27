@@ -90,7 +90,13 @@ static const uint8_t originalImage3[imgHeight * imgWidth * 4] = {
 
 @implementation CorrelationTests {
     void *temp;
+    void *temp2;
     void *blockBuffer;
+    
+    void *fftRealBlockBuffer;
+    void *fftImagBlockBuffer;
+    
+    void *zeroBuff;
     
     CGRect roi;
     vImage_CGImageFormat cgFormat;
@@ -100,26 +106,220 @@ static const uint8_t originalImage3[imgHeight * imgWidth * 4] = {
     CGImageRef cgOriginalImage3;
     
     struct FhgData data;
+    
+    FFTSetup setup;
 }
 
 - (void)setUp {
     // Put setup code here. This method is called before the invocation of each test method in the class.
     roi = CGRectMake(1., 1., 8., 8.);
     
-    fhgPreOpsCreateCGFormat(&cgFormat);
-    fhgPreOpsCreateData(&data, 4, 3, &roi, imgHeight, imgWidth);
+    fhg_preOps_createCGFormat(&cgFormat);
+    fhg_preOps_createData(&data, 4, 3, &roi, imgHeight, imgWidth);
     
-    fhgPreOpsAllocTemp(&temp, &data);
-    fhgPreOpsAllocBlockBuffer(&blockBuffer, &data);
+    fhg_preOps_allocTemp(&temp,  &data);
+    fhg_preOps_allocTemp(&temp2, &data);
+    
+    fhg_preOps_allocBlockBuffer(&blockBuffer, &data);
+    fhg_preOps_allocBlockBuffer(&fftRealBlockBuffer, &data);
+    fhg_preOps_allocBlockBuffer(&fftImagBlockBuffer, &data);
+    
+    zeroBuff = calloc(data.block.area * 2, 4);
     
     
     CREATE_CG_IMG(originalImage1, cgOriginalImage1, cgFormat);
     CREATE_CG_IMG(originalImage2, cgOriginalImage2, cgFormat);
     CREATE_CG_IMG(originalImage3, cgOriginalImage3, cgFormat);
+    
+    setup = vDSP_create_fftsetup(data.fftSetupLength, kFFTRadix2);
+    
+    XCTAssertNotEqual(setup, NULL, @"Error: setup is NULL");
+    printf("FFT: %u & %u\n", data.fftSetupLength, data.fft2DLength);
 }
 
-- (void)tearDown {
+- (void)testPrintCGOrigImage {
+    // This is an example of a functional test case.
+    // Use XCTAssert and related functions to verify your tests produce the correct results.
+    
+    vImage_Buffer inBuff = {
+        .data     = temp,
+        .height   = CGImageGetHeight(cgOriginalImage1),
+        .width    = CGImageGetWidth (cgOriginalImage1),
+        .rowBytes = CGImageGetBytesPerRow(cgOriginalImage1),
+    };
+    
+    const vImage_Error convErr = vImageBuffer_InitWithCGImage(&inBuff, &cgFormat, NULL, cgOriginalImage3, kvImageNoAllocate);
+    if (convErr != kvImageNoError) {
+        printf("ERROR = %d\n", (int)convErr);
+        return;
+    }
+    
+    const uint8_t *const tmp = (uint8_t *)temp;
+    printf("\n\\***********************************************\\\n"); // CHECK
+    for (size_t i = 0; i < imgHeight; ++i) {
+        for (size_t j = 0; j < imgWidth; ++j) {
+            printf("%hu,%hu,%hu,%hu  ",
+                   (uint16_t)tmp[i * imgWidth * 4 + j * 4 + 0],
+                   (uint16_t)tmp[i * imgWidth * 4 + j * 4 + 1],
+                   (uint16_t)tmp[i * imgWidth * 4 + j * 4 + 2],
+                   (uint16_t)tmp[i * imgWidth * 4 + j * 4 + 3]);
+        }
+        
+        printf("\n\n");
+    }
+    printf("\n\\***********************************************\\\n");
+}
+
+- (void)testFstStep {
+    fhg_ops_convertFullFrameToBlocks(cgOriginalImage1, &cgFormat, &data, blockBuffer, temp);
+    fhg_ops_convertFullFrameToBlocks(cgOriginalImage2, &cgFormat, &data, blockBuffer + data.roi.offsetBytes, temp);
+    fhg_ops_convertFullFrameToBlocks(cgOriginalImage3, &cgFormat, &data, blockBuffer + data.roi.offsetBytes * 2, temp);
+    
+    const float *const bata = (float *)blockBuffer;
+    
+    printf("\n\\***********************************************\\\n");
+    for (size_t fn = 0; fn < data.numberOfFrames; ++fn) {
+        for (size_t i = 0; i < data.blocksPerRoi; ++i) {
+            const float *const frameStart = bata + fn * data.roi.offsetCount + i * data.block.area;
+            for (size_t j = 0; j < data.block.width; ++j) {
+                for (size_t k = 0; k < data.block.width; ++k) {
+                    printf("%ld, ", lroundf( 255.*frameStart[j * data.block.width + k]));
+                }
+                printf("\n");
+            }
+            printf("\n");
+        }
+        printf("===\n");
+    }
+    
+    printf("\n\\***********************************************\\");
+    for (size_t i = 0; i < data.roi.area * 3; ++i)
+        printf("%s%f, ", ((i & 3) ? "":"\n"), 255. * bata[i]);
+    printf("\n\\***********************************************\\\n");
+    
+    printf("\n\\***********************************************\\");
+    for (size_t i = 0; i < 2 * data.roi.area; ++i)
+        printf("%s%f, ", ((i & 3) ? "":"\n"), ((float *)blockBuffer)[i] * 255.);
+    printf("\n\\***********************************************\\\n");
+    printf("\n\\***********************************************\\\n");
+    for (size_t i = 0; i < 2; ++i) {
+        for (size_t j = 0; j < data.blocksPerRoi; ++j) {
+            for (size_t k = 0; k < data.block.area; ++k) {
+                const float pix = ((float *)blockBuffer)[i * data.roi.area + j * data.block.area + k];
+                
+                printf("%f, ", pix * 255.);
+            }
+            printf("\n");
+        }
+        printf("\n");
+    }
+    printf("\n\\***********************************************\\\n");
+}
+
+- (void)testFFT {
+    
+    XCTAssertEqual(1 << data.fft2DLength, data.block.width);
+    //XCTAssertEqual(1 << (data.fftSetupLength - 3), data.block.area);
     // Put teardown code here. This method is called after the invocation of each test method in the class.
+    fhg_ops_convertFullFrameToBlocks(cgOriginalImage1, &cgFormat, &data, blockBuffer, temp);
+    fhg_ops_convertFullFrameToBlocks(cgOriginalImage2, &cgFormat, &data, blockBuffer + data.roi.offsetBytes, temp);
+    fhg_ops_convertFullFrameToBlocks(cgOriginalImage3, &cgFormat, &data, blockBuffer + data.roi.offsetBytes * 2, temp);
+    
+    const DSPSplitComplex t = { .realp = temp, .imagp = temp2 };
+    
+    for (size_t fn = 0; fn < data.numberOfFrames; ++fn) {
+        for (size_t i = 0; i < data.blocksPerRoi; ++i) {
+            const size_t offset = fn * data.roi.offsetBytes + i * data.block.offsetBytes;
+            
+//            const float *const frameStart = blockBuffer + offset;//bata + fn * data.roi.offsetCount + i * data.block.area;
+//            for (size_t j = 0; j < data.block.width; ++j) {
+//                for (size_t k = 0; k < data.block.width; ++k) {
+//                    printf("%f, ", 255.*frameStart[j * data.block.width + k]);
+//                }
+//                printf("\n");
+//            }
+//            printf("\n");
+            
+            
+            const DSPSplitComplex a = { .realp = blockBuffer + offset, .imagp = zeroBuff };
+            const DSPSplitComplex c = { .realp = fftRealBlockBuffer + offset, .imagp = fftImagBlockBuffer + offset };
+            
+            vDSP_fft2d_zopt(setup, &a, 1, 0, &c, 1, 0, &t, data.fft2DLength, data.fft2DLength, kFFTDirection_Forward);
+        }
+    }
+    
+    for (size_t fn = 0; fn < data.numberOfFrames; ++fn) {
+        for (size_t i = 0; i < data.blocksPerRoi; ++i) {
+            const size_t offset = fn * data.roi.offsetBytes + i * data.block.offsetBytes;
+            
+            const float *const frameStartReal = fftRealBlockBuffer + offset;
+            const float *const frameStartImag = fftImagBlockBuffer + offset;
+            
+            for (size_t j = 0; j < data.block.width; ++j) {
+                for (size_t k = 0; k < data.block.width; ++k) {
+                    printf("%+.2f%+.2fi  ",
+                           255. * frameStartReal[j * data.block.width + k],
+                           255. * frameStartImag[j * data.block.width + k]);
+                }
+                printf("\n");
+            }
+            printf("\n");
+        }
+        printf("===\n");
+    }
+}
+
+- (void)testXCorr {
+    
+    XCTAssertEqual(1 << data.fft2DLength, data.block.width);
+    //XCTAssertEqual(1 << (data.fftSetupLength - 3), data.block.area);
+    // Put teardown code here. This method is called after the invocation of each test method in the class.
+    fhg_ops_convertFullFrameToBlocks(cgOriginalImage1, &cgFormat, &data, blockBuffer, temp);
+    fhg_ops_convertFullFrameToBlocks(cgOriginalImage2, &cgFormat, &data, blockBuffer + data.roi.offsetBytes, temp);
+    fhg_ops_convertFullFrameToBlocks(cgOriginalImage3, &cgFormat, &data, blockBuffer + data.roi.offsetBytes * 2, temp);
+    
+    const DSPSplitComplex t = { .realp = temp, .imagp = temp2 };
+    
+    for (size_t fn = 0; fn < data.numberOfFrames; ++fn) {
+        for (size_t i = 0; i < data.blocksPerRoi; ++i) {
+            const size_t offset = fn * data.roi.offsetBytes + i * data.block.offsetBytes;
+            
+            //            const float *const frameStart = blockBuffer + offset;//bata + fn * data.roi.offsetCount + i * data.block.area;
+            //            for (size_t j = 0; j < data.block.width; ++j) {
+            //                for (size_t k = 0; k < data.block.width; ++k) {
+            //                    printf("%f, ", 255.*frameStart[j * data.block.width + k]);
+            //                }
+            //                printf("\n");
+            //            }
+            //            printf("\n");
+            
+            
+            const DSPSplitComplex a = { .realp = blockBuffer + offset, .imagp = zeroBuff };
+            const DSPSplitComplex c = { .realp = fftRealBlockBuffer + offset, .imagp = fftImagBlockBuffer + offset };
+            
+            vDSP_fft2d_zopt(setup, &a, 1, 0, &c, 1, 0, &t, data.fft2DLength, data.fft2DLength, kFFTDirection_Forward);
+        }
+    }
+    
+    for (size_t fn = 0; fn < data.numberOfFrames; ++fn) {
+        for (size_t i = 0; i < data.blocksPerRoi; ++i) {
+            const size_t offset = fn * data.roi.offsetBytes + i * data.block.offsetBytes;
+            
+            const float *const frameStartReal = fftRealBlockBuffer + offset;
+            const float *const frameStartImag = fftImagBlockBuffer + offset;
+            
+            for (size_t j = 0; j < data.block.width; ++j) {
+                for (size_t k = 0; k < data.block.width; ++k) {
+                    printf("%+.2f%+.2fi  ",
+                           255. * frameStartReal[j * data.block.width + k],
+                           255. * frameStartImag[j * data.block.width + k]);
+                }
+                printf("\n");
+            }
+            printf("\n");
+        }
+        printf("===\n");
+    }
 }
 
 - (void)testExample {

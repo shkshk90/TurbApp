@@ -66,11 +66,11 @@ static const uint8_t originalImage2[imgHeight * imgWidth * 4] = {
 - (void)setUp {
     roi = CGRectMake((CGFloat)x, (CGFloat)y, 4.f, 4.f);
     
-    fhgPreOpsCreateCGFormat(&cgFormat);
-    fhgPreOpsCreateData(&data, 2, 2, &roi, imgHeight, imgWidth);
+    fhg_preOps_createCGFormat(&cgFormat);
+    fhg_preOps_createData(&data, 2, 2, &roi, imgHeight, imgWidth);
     
-    fhgPreOpsAllocTemp(&temp, &data);
-    fhgPreOpsAllocBlockBuffer(&blockBuffer, &data);
+    fhg_preOps_allocTemp(&temp, &data);
+    fhg_preOps_allocBlockBuffer(&blockBuffer, &data);
     
     CFDataRef data1 = CFDataCreate(NULL, originalImage, imgHeight * imgWidth * 4);
     CFDataRef data2 = CFDataCreate(NULL, originalImage2, imgHeight * imgWidth * 4);
@@ -306,7 +306,7 @@ static const uint8_t originalImage2[imgHeight * imgWidth * 4] = {
 }
 
 - (void)testSingleFirstStep {
-    fhgOpsConvertFullFrameToBlocks(cgOriginalImage1, &cgFormat, &data, blockBuffer, temp);
+    fhg_ops_convertFullFrameToBlocks(cgOriginalImage1, &cgFormat, &data, blockBuffer, temp);
     const float *const bata = (float *)blockBuffer;
     
     long blockValues[16];
@@ -338,8 +338,8 @@ static const uint8_t originalImage2[imgHeight * imgWidth * 4] = {
 
 - (void)testMultipleFrames {
     printf("ROI Offset = %lu, %lu\n", data.roi.offsetCount, data.roi.offsetBytes);
-    fhgOpsConvertFullFrameToBlocks(cgOriginalImage1, &cgFormat, &data, blockBuffer, temp);
-    fhgOpsConvertFullFrameToBlocks(cgOriginalImage2, &cgFormat, &data, blockBuffer + data.roi.offsetBytes, temp);
+    fhg_ops_convertFullFrameToBlocks(cgOriginalImage1, &cgFormat, &data, blockBuffer, temp);
+    fhg_ops_convertFullFrameToBlocks(cgOriginalImage2, &cgFormat, &data, blockBuffer + data.roi.offsetBytes, temp);
     const float *const bata = (float *)blockBuffer;
     
     printf("\n\\***********************************************\\\n");

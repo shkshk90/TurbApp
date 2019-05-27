@@ -368,11 +368,11 @@ static const uint8_t originalImage2[imgHeight * imgWidth * 4] = {
 //    void *bbuf = NULL;
 //    
 //    struct FhgData data;
-//    fhgPreOpsCreateData(&data, 2, 2, &roi, imgHeight, imgWidth);
+//    fhg_preOps_createData(&data, 2, 2, &roi, imgHeight, imgWidth);
 //    
-//    fhgPreOpsCreateCGFormat(&format);
-//    fhgPreOpsAllocTemp(&temp, &data);
-//    fhgPreOpsAllocBlockBuffer(&temp, &data);
+//    fhg_preOps_createCGFormat(&format);
+//    fhg_preOps_allocTemp(&temp, &data);
+//    fhg_preOps_allocBlockBuffer(&temp, &data);
 //    
 //    CFDataRef data1 = CFDataCreate(NULL, originalImage, imgHeight * imgWidth * 4);
 //    CFDataRef data2 = CFDataCreate(NULL, originalImage2, imgHeight * imgWidth * 4);
@@ -389,8 +389,8 @@ static const uint8_t originalImage2[imgHeight * imgWidth * 4] = {
 //    CGDataProviderRelease(dataProvider1);
 //    CGDataProviderRelease(dataProvider2);
 //    
-//    fhgOpsConvertFullFrameToBlocks(cgImage1, &format, &data, bbuf, temp);
-//    fhgOpsConvertFullFrameToBlocks(cgImage2, &format, &data, bbuf + data.roi.offsetBytes, temp);
+//    fhg_ops_convertFullFrameToBlocks(cgImage1, &format, &data, bbuf, temp);
+//    fhg_ops_convertFullFrameToBlocks(cgImage2, &format, &data, bbuf + data.roi.offsetBytes, temp);
 //    
 //    printf("\n\\***********************************************\\");
 //    for (size_t i = 0; i < 2 * data.roi.offsetCount; ++i)

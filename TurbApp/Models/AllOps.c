@@ -18,7 +18,7 @@
 #include <assert.h>
 
 void
-fhgPreOpsCreateCGFormat(vImage_CGImageFormat *const restrict format)
+fhg_preOps_createCGFormat(vImage_CGImageFormat *const restrict format)
 {
     format->bitmapInfo       = kCGImageAlphaFirst | kCGBitmapByteOrder32Little;
     format->bitsPerComponent = 8;
@@ -30,8 +30,8 @@ fhgPreOpsCreateCGFormat(vImage_CGImageFormat *const restrict format)
 }
 
 void
-fhgPreOpsCreateData(struct FhgData *const restrict data, const uint32_t blockSide,  const uint32_t numberOfFrames,
-                    const  CGRect  *const restrict roi,  const uint32_t frameHeight, const uint32_t frameWidth)
+fhg_preOps_createData(struct FhgData *const restrict data, const uint32_t blockSide,  const uint32_t numberOfFrames,
+                      const  CGRect  *const restrict roi,  const uint32_t frameHeight, const uint32_t frameWidth)
 {
     const uint32_t roiHeight = (uint32_t)lroundf(roi->size.height);
     const uint32_t roiWidth  = (uint32_t)lroundf(roi->size.width);
@@ -74,9 +74,12 @@ fhgPreOpsCreateData(struct FhgData *const restrict data, const uint32_t blockSid
     
     data->roiOriginPointX   = roi->origin.x;
     data->roiOriginPointY   = roi->origin.y;
+    
+    data->fftSetupLength    = fhgm_log2n(blockSide * blockSide) + 1 + 2; // 3
+    data->fft2DLength       = fhgm_log2n(blockSide); 
 }
 
-void fhgPreOpsAllocTemp(void **buffer, const struct FhgData *const restrict data)
+void fhg_preOps_allocTemp(void **buffer, const struct FhgData *const restrict data)
 {
     if (*buffer)
         free(*buffer);
@@ -106,7 +109,7 @@ void fhgPreOpsAllocTemp(void **buffer, const struct FhgData *const restrict data
     FHGM_CPR_ASSERT(*buffer != NULL, "Temp buffer is NULL", NULL);
 }
 
-void fhgPreOpsAllocBlockBuffer(void **buffer, const struct FhgData *const restrict data)
+void fhg_preOps_allocBlockBuffer(void **buffer, const struct FhgData *const restrict data)
 {
     if (*buffer)
         free(*buffer);
@@ -119,7 +122,7 @@ void fhgPreOpsAllocBlockBuffer(void **buffer, const struct FhgData *const restri
 }
 
 
-void fhgOpsConvertFullFrameToBlocks(const restrict CGImageRef fullFrame,
+void fhg_ops_convertFullFrameToBlocks(const restrict CGImageRef fullFrame,
                                     const vImage_CGImageFormat *const restrict format,
                                     const struct FhgData *const restrict data,
                                     void *const restrict blocksBuffer,
