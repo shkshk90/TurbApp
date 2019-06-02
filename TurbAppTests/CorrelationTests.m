@@ -269,6 +269,144 @@ static const uint8_t originalImage3[imgHeight * imgWidth * 4] = {
     }
 }
 
+- (void)testFTPad       
+{
+    static const float mul = 4;
+    static const float imFT[] = {1413184,126,64,127,18431,-1,-1,-1,9216,-1,-1,-1,18430,-1,-1,-1};
+    float *const imFTMul4 = calloc(4*4, 4);
+    float *const imFTOut = calloc(8*8, 4);
+    
+    vDSP_vsmul(imFT, 1, &mul, imFTMul4, 1, 4*4);
+    
+    for (int i = 0; i < 4; ++i) {
+        for (int j = 0; j < 4; ++j) {
+            printf("%.f,  ", imFTMul4[4*i+j]);
+        }
+        printf("\n");
+    }
+    
+    printf("\n\n\n");
+    
+    static const size_t f = 4;
+    static const size_t a = 0;
+    static const size_t b = 2;
+    
+    static const size_t ff = 8;
+ //   static const size_t aa = 0;
+ //   static const size_t bb = 4;
+    
+
+    
+    vDSP_mmov(&imFTMul4[f*a + a], &imFTOut[0],2,2,4, 8);
+    vDSP_mmov(&imFTMul4[f*a + b], &imFTOut[ff - b],2,2,4, 8);
+    vDSP_mmov(&imFTMul4[f*b + a], &imFTOut[ff*(ff-2)],2,2,4, 8);
+    vDSP_mmov(&imFTMul4[f*b + b], &imFTOut[ff*(ff-2) + ff - b],2,2,4, 8);
+    
+    for (int i = 0; i < 8; ++i) {
+        for (int j = 0; j < 8; ++j) {
+            printf("%.f,  ", imFTOut[8*i+j]);
+        }
+        printf("\n");
+    }
+    
+    printf("\n\n\n");
+    
+}
+
+- (void)testFTPadZ
+{
+    static const float kMulFactor = 4.f;
+    static const float kZero = 0.f;
+    
+    const size_t bs = 4;
+    const size_t hs = bs / 2;
+    const size_t ds = bs * 2;
+    
+    float *const temp = calloc(2*4*4, 4);
+    
+    static  float imR[] = {649792,128,64,128,  -73728,-1,-1,-1, -82944,-1,-1,-1, -73728,-1,-1,-1};
+    static  float imI[] = {0,0,0,0,  92160,0,0,0,  -0,0,0,0,  -92160,0,0,0};
+    
+    const DSPSplitComplex input = {imR, imI};
+    const DSPSplitComplex fourComplex = {  .realp = (float *)&kMulFactor, .imagp = (float *)&kZero };
+    const DSPSplitComplex inputMulFour = { .realp = temp, .imagp = temp + bs * bs * sizeof(float) };
+    const DSPSplitComplex output = {
+        .realp = calloc(2*8*8, 4),
+        .imagp = calloc(2*8*8, 4)
+    };
+    
+    vDSP_zvzsml(&input, 1, &fourComplex, &inputMulFour, 1, bs*bs);
+    
+    for (int i = 0; i < 4; ++i) {
+        for (int j = 0; j < 4; ++j) {
+            printf("%.f,  ", inputMulFour.realp[4*i+j]);
+        }
+        printf("\n");
+    }
+    printf("\n");
+    for (int i = 0; i < 4; ++i) {
+        for (int j = 0; j < 4; ++j) {
+            printf("%.f,  ", inputMulFour.imagp[4*i+j]);
+        }
+        printf("\n");
+    }
+    
+    printf("\n\n\n");
+    
+    const float *const inpRealPtr = inputMulFour.realp;
+    const float *const inpImagPtr = inputMulFour.imagp;
+    
+    float *const outRealPtr = output.realp;
+    float *const outImagPtr = output.imagp;
+    
+    // 4 input quadrants indeces
+    const size_t ia = 0;
+    const size_t ib = hs;
+    const size_t ic = bs * ib;
+    const size_t iz = ic + ib;
+    
+    // 4 output quadrants indeces
+    const size_t oa = 0;
+    const size_t ob = ds - hs;
+    const size_t oc = ds * ob;
+    const size_t od = oc + ob;
+    
+    
+    vDSP_mmov(&inpRealPtr[ia], &outRealPtr[oa], hs, hs, bs, ds);
+    vDSP_mmov(&inpRealPtr[ib], &outRealPtr[ob], hs, hs, bs, ds);
+    vDSP_mmov(&inpRealPtr[ic], &outRealPtr[oc], hs, hs, bs, ds);
+    vDSP_mmov(&inpRealPtr[iz], &outRealPtr[od], hs, hs, bs, ds);
+    
+    vDSP_mmov(&inpImagPtr[ia], &outImagPtr[oa], hs, hs, bs, ds);
+    vDSP_mmov(&inpImagPtr[ib], &outImagPtr[ob], hs, hs, bs, ds);
+    vDSP_mmov(&inpImagPtr[ic], &outImagPtr[oc], hs, hs, bs, ds);
+    vDSP_mmov(&inpImagPtr[iz], &outImagPtr[od], hs, hs, bs, ds);
+    
+    for (int i = 0; i < 8; ++i) {
+        for (int j = 0; j < 8; ++j) {
+            printf("%.f+%.fi,  ", output.realp[8*i+j], output.imagp[8*i+j]);
+        }
+        printf("\n");
+    }
+    
+    for (int i = 0; i < 8; ++i) {
+        for (int j = 0; j < 8; ++j) {
+            printf("%.f,  ", output.realp[8*i+j]);
+        }
+        printf("\n");
+    }
+    printf("\n");
+    for (int i = 0; i < 8; ++i) {
+        for (int j = 0; j < 8; ++j) {
+            printf("%.f,  ", output.imagp[8*i+j]);
+        }
+        printf("\n");
+    }
+    
+    printf("\n\n\n");
+    
+}
+
 - (void)testXCorr {
     
     XCTAssertEqual(1 << data.fft2DLength, data.block.width);

@@ -18,7 +18,7 @@ typedef struct CGRect CGRect;
 typedef struct CGImage *CGImageRef;
 typedef struct vImage_CGImageFormat vImage_CGImageFormat;
 
-typedef struct DSPSplitComplex  DSPSplitComplex;
+//typedef struct DSPSplitComplex  DSPSplitComplex;
 typedef struct OpaqueFFTSetup  *FFTSetup;
 
 /// ======================== SETUP OPERATIONS =================================================================== ///

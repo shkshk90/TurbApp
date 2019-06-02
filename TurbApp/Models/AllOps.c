@@ -17,6 +17,17 @@
 #include <math.h>
 #include <assert.h>
 
+
+/********************************** PRIVATIE METHODS *************************/
+// TESTED, WORKS PERFECTLY AND FAR LESS COMPLEX AND FAR MORE EFFICIENT THAN MATLAB
+static inline void ftPad(const DSPSplitComplex *const restrict input,   // block area
+                         const DSPSplitComplex *const restrict output,  // 2 * blockarea
+                         const struct FhgData *const restrict data,
+                         void *const restrict temp);
+/****************************** END PRIVATIE METHODS *************************/
+
+
+
 void
 fhg_preOps_createCGFormat(vImage_CGImageFormat *const restrict format)
 {
@@ -140,3 +151,52 @@ void fhg_ops_convertFullFrameToBlocks(const restrict CGImageRef fullFrame,
     fhgmFillBufferWithBlocks(&roiBluePlaneInFloats, blocksBuffer, data);
 }
 
+
+
+static inline void ftPad(const DSPSplitComplex *const restrict input,
+                         const DSPSplitComplex *const restrict output,
+                         const struct FhgData *const restrict data,
+                         void *const restrict tempBuffer)
+{
+    static const float kZero = 0.f;
+    static const float kFour = 4.f;
+    
+    const size_t bs = data->block.width;
+    const size_t hs = bs / 2;
+    const size_t ds = bs * 2;
+    
+    
+    const DSPSplitComplex fourComplex = {  .realp = (float *)&kFour, .imagp = (float *)&kZero };
+    const DSPSplitComplex inputMulFour = { .realp = tempBuffer, .imagp = tempBuffer + data->block.area * sizeof(float) };
+    
+    vDSP_zvzsml(input, 1, &fourComplex, &inputMulFour, 1, data->block.area);
+    
+    const float *const inpRealPtr = inputMulFour.realp;
+    const float *const inpImagPtr = inputMulFour.imagp;
+    
+    float *const outRealPtr = output->realp;
+    float *const outImagPtr = output->imagp;
+    
+    // 4 input quadrants indeces
+    const size_t ia = 0;
+    const size_t ib = hs;
+    const size_t ic = bs * ib;
+    const size_t iz = ic + ib;
+    
+    // 4 output quadrants indeces
+    const size_t oa = 0;
+    const size_t ob = ds - hs;
+    const size_t oc = ds * ob;
+    const size_t oz = oc + ob;
+    
+    
+    vDSP_mmov(&inpRealPtr[ia], &outRealPtr[oa], hs, hs, bs, ds);
+    vDSP_mmov(&inpRealPtr[ib], &outRealPtr[ob], hs, hs, bs, ds);
+    vDSP_mmov(&inpRealPtr[ic], &outRealPtr[oc], hs, hs, bs, ds);
+    vDSP_mmov(&inpRealPtr[iz], &outRealPtr[oz], hs, hs, bs, ds);
+    
+    vDSP_mmov(&inpImagPtr[ia], &outImagPtr[oa], hs, hs, bs, ds);
+    vDSP_mmov(&inpImagPtr[ib], &outImagPtr[ob], hs, hs, bs, ds);
+    vDSP_mmov(&inpImagPtr[ic], &outImagPtr[oc], hs, hs, bs, ds);
+    vDSP_mmov(&inpImagPtr[iz], &outImagPtr[oz], hs, hs, bs, ds);
+}
